@@ -1,0 +1,45 @@
+server:
+  port: 8082
+  session:
+    timeout: 1800
+  #address: acount.yayao8.com
+  tomcat:
+    max-threads: 1000
+    min-spare-threads: 200
+    accept-count: 1000
+    max-connections: 1000
+ # connection-timeout: 60 
+spring:
+   datasource:
+     name: master
+     driver-class-name: com.mysql.jdbc.Driver
+     url: jdbc:mysql://39.108.60.100:3306/book_store_db
+     username: root
+     password: liliu
+   redis:
+     host: 39.108.60.100
+     password: liliu
+     port: 6379 
+     database: 1
+     timeout: 3000
+     pool: 
+       min-idle: 100
+       max-idle: 300
+       max-active: 800 
+myPugin: 
+  session: 
+    myDomainName: newzhuan.cn
+  projectName: BookStore
+  location: /home/config/thirdParty.properties
+  requestAuth: requestAuthProd
+  sevenSecondsDomainUrl: http://www.newzhuan.cn
+  rabbitmq:
+    BOOKORDER_DIRECT_EXCHANGE: bookorder.bookstore.exchange.direct
+    BOOKORDER_DIRECT_ROUTINGKEY: bookorder.bookstore.routingkey.direct
+    BOOKORDER_DIRECT_QUEUE: bookorder.bookstore.queue.direct
+    BOOKORDERFLOWWATER_DIRECT_EXCHANGE: bookorderflowwater.bookstore.exchange.direct
+    BOOKORDERFLOWWATER_DIRECT_ROUTINGKEY: bookorderflowwater.bookstore.routingkey.direct
+    BOOKORDERFLOWWATER_DIRECT_QUEUE: bookorderflowwater.bookstore.queue.direct
+    BOOKWEBREAD_DIRECT_EXCHANGE: bookwebread.bookstore.exchange.direct
+    BOOKWEBREAD_DIRECT_ROUTINGKEY: bookwebread.bookstore.routingkey.direct
+    BOOKWEBREAD_DIRECT_QUEUE: bookwebread.bookstore.queue.direct

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.nieyue.dao.BookChapterDao">
+<!-- 添加书章节 -->
+<insert id="addBookChapter" parameterType="BookChapter" keyProperty="bookChapterId" flushCache="true"  >  
+   INSERT IGNORE INTO
+   		  book_chapter_tb 
+   		 (
+   		 number,
+   		 title,
+   		 word_number,
+   		 content,
+   		 status,
+   		 book_id,
+   		 create_date,
+   		 update_date)
+   VALUES
+    	 (
+    	 #{number},
+    	 #{title},
+    	 #{wordNumber},
+    	 #{content},
+    	 #{status},
+    	 #{bookId},
+    	 #{createDate},
+    	 #{updateDate})  
+</insert>  
+<!-- 更新书章节 -->
+<update id="updateBookChapter" parameterType="BookChapter" >  
+    UPDATE 
+    	book_chapter_tb 
+    <set>
+    <if test="number!=null">
+    	number=#{number},
+    </if>
+    <if test="title!=null">
+    	title=#{title},
+    </if>
+    <if test="wordNumber!=null">
+    	word_number=#{wordNumber},
+    </if>
+    <if test="content!=null">
+    	content=#{content},
+    </if>
+    <if test="status!=null">
+    	status=#{status},
+    </if>
+    <if test="bookId!=null">
+    	book_id=#{bookId},
+    </if>
+    <if test="createDate!=null">
+    	create_date=#{createDate},
+    </if>
+    <if test="updateDate!=null">
+    	update_date=#{updateDate}
+    </if>
+    </set>
+    WHERE
+    	 book_chapter_id=#{bookChapterId} 
+</update> 
+<!-- 删除书章节-->
+<delete id="delBookChapter"  parameterType="Integer" >  
+    DELETE FROM
+    	 book_chapter_tb 
+    	 WHERE book_chapter_id=#{bookChapterId}
+</delete>  
+<!-- 加载书章节-->
+<select id="loadBookChapter" parameterType="Integer" resultType="BookChapter" >
+SELECT 
+		 book_chapter_id,
+	 	 number,
+   		 title,
+   		 word_number,
+   		 content,
+   		 status,
+   		 book_id,
+   		 create_date,
+   		 update_date
+FROM book_chapter_tb 
+WHERE book_chapter_id=#{bookChapterId}
+</select>
+<!-- 加载Small书章节-->
+<select id="loadSmallBookChapter" parameterType="Integer" resultType="BookChapter" >
+SELECT 
+		 book_chapter_id,
+	 	 number,
+   		 title,
+   		 word_number,
+   		 <!-- content, -->
+   		 status,
+   		 book_id,
+   		 create_date,
+   		 update_date
+FROM book_chapter_tb 
+WHERE book_chapter_id=#{bookChapterId}
+</select>
+
+<!-- 分页查询书章节-->
+<select id="browsePagingBookChapter" resultType="BookChapter">  
+        SELECT
+	     book_chapter_id,
+	 	 number,
+   		 title,
+   		 word_number,
+   		 <!-- content, -->
+   		 status,
+   		 book_id,
+   		 create_date,
+   		 update_date
+	FROM book_chapter_tb
+	<where>
+	<if test="number!=null">
+	AND number=#{number}
+	</if>
+	<if test="wordNumber!=null">
+	AND word_number>=#{wordNumber}
+	</if>
+	<if test="bookId!=null">
+	AND book_id=#{bookId}
+	</if>
+	<if test="createDate!=null">
+	AND Date(create_date)=Date(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND Date(update_date)=Date(#{updateDate})
+	</if>
+	<if test="status!=null">
+	AND status=#{status}
+	</if>
+	AND ${orderName} 
+	<if test="orderWay=='asc'">
+	<![CDATA[>=]]> 
+	</if>
+	<if test="orderWay=='desc'">
+	  <![CDATA[<= ]]>
+	</if>
+	(SELECT ${orderName} FROM book_chapter_tb 
+	<where>
+	<if test="number!=null">
+	AND number=#{number}
+	</if>
+	<if test="wordNumber!=null">
+	AND word_number>=#{wordNumber}
+	</if>
+	<if test="bookId!=null">
+	AND book_id=#{bookId}
+	</if>
+	<if test="createDate!=null">
+	AND Date(create_date)=Date(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND Date(update_date)=Date(#{updateDate})
+	</if>
+	<if test="status!=null">
+	AND status=#{status}
+	</if>
+	</where>
+		ORDER BY 
+			${orderName}  ${orderWay}
+		LIMIT #{pageNum}, 1
+		) 
+	</where>
+	ORDER BY
+		${orderName}  ${orderWay}
+	LIMIT
+		#{pageSize}
+</select> 
+
+<!-- 统计记录条数 -->
+<select id="countAll"  resultType="int">  
+	SELECT
+	 	count(book_chapter_id)
+	FROM book_chapter_tb
+	<where>
+	<if test="number!=null">
+	AND number=#{number}
+	</if>
+	<if test="wordNumber!=null">
+	AND word_number>=#{wordNumber}
+	</if>
+	<if test="bookId!=null">
+	AND book_id=#{bookId}
+	</if>
+	<if test="createDate!=null">
+	AND Date(create_date)=Date(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND Date(update_date)=Date(#{updateDate})
+	</if>
+	<if test="status!=null">
+	AND status=#{status}
+	</if>
+	</where>
+</select>   
+   
+ 
+</mapper>

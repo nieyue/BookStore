@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.nieyue.dao.BookCateDao">
+<!-- 添加书类型 -->
+<insert id="addBookCate" parameterType="BookCate" keyProperty="bookCateId" flushCache="true"  >  
+   INSERT IGNORE INTO
+   		  book_cate_tb 
+   		 (name,update_date)
+   VALUES
+    	 (#{name},#{updateDate})  
+</insert>  
+<!-- 更新书类型 -->
+<update id="updateBookCate" parameterType="BookCate" >  
+    UPDATE 
+    	book_cate_tb 
+    SET 
+    	name=#{name},
+    	update_date=#{updateDate}
+    WHERE
+    	 book_cate_id=#{bookCateId} 
+</update> 
+<!-- 删除书类型-->
+<delete id="delBookCate"  parameterType="Integer" >  
+    DELETE FROM
+    	 book_cate_tb 
+    	 WHERE book_cate_id=#{bookCateId}
+</delete>  
+<!-- 加载书类型-->
+<select id="loadBookCate" parameterType="Integer" resultType="BookCate" >
+SELECT 
+		book_cate_id,
+	 	name,
+    	update_date
+FROM book_cate_tb 
+WHERE book_cate_id=#{bookCateId}
+</select>
+
+<!-- 分页查询书类型-->
+<select id="browsePagingBookCate" resultType="BookCate">  
+        SELECT
+	    book_cate_id,
+	 	name,
+    	update_date
+	FROM book_cate_tb
+	WHERE ${orderName} 
+	<if test="orderWay=='asc'">
+	<![CDATA[>=]]> 
+	</if>
+	<if test="orderWay=='desc'">
+	  <![CDATA[<= ]]>
+	</if>
+	(SELECT ${orderName} FROM book_cate_tb 
+		ORDER BY 
+			${orderName}  ${orderWay}
+		LIMIT #{pageNum}, 1
+		) 
+	ORDER BY
+		${orderName}  ${orderWay}
+	LIMIT
+		#{pageSize}
+</select> 
+
+<!-- 统计记录条数 -->
+<select id="countAll"  resultType="int">  
+	SELECT
+	 	count(book_cate_id)
+	FROM book_cate_tb
+</select>   
+   
+ 
+</mapper>

@@ -1,0 +1,45 @@
+server:
+  port: 8081
+  session:
+    timeout: 1800
+  tomcat: 
+    max-threads: 1000
+    min-spare-threads: 200
+    accept-count: 1000
+    max-connections: 1000
+ # connection-timeout: 60
+ 
+spring:
+   datasource: 
+     name: master
+     driver-class-name: com.mysql.jdbc.Driver
+     url: jdbc:mysql://127.0.0.1:3306/book_store_db
+     username: root
+     password: liliu 
+   redis:
+     host: 127.0.0.1
+     password: liliu
+     port: 6379 
+     database: 1
+     timeout: 3000
+     pool: 
+       min-idle: 100
+       max-idle: 300
+       max-active: 800 
+myPugin: 
+  session: 
+    myDomainName: null
+  projectName: BookStore
+  location: c://config/thirdParty.properties
+  requestAuth: requestAuthDev
+  sevenSecondsDomainUrl: http://192.168.7.111
+  rabbitmq:
+    BOOKORDER_DIRECT_EXCHANGE: test.bookorder.bookstore.exchange.direct
+    BOOKORDER_DIRECT_ROUTINGKEY: test.bookorder.bookstore.routingkey.direct
+    BOOKORDER_DIRECT_QUEUE: test.bookorder.bookstore.queue.direct
+    BOOKORDERFLOWWATER_DIRECT_EXCHANGE: test.bookorderflowwater.bookstore.exchange.direct
+    BOOKORDERFLOWWATER_DIRECT_ROUTINGKEY: test.bookorderflowwater.bookstore.routingkey.direct
+    BOOKORDERFLOWWATER_DIRECT_QUEUE: test.bookorderflowwater.bookstore.queue.direct
+    BOOKWEBREAD_DIRECT_EXCHANGE: test.bookwebread.bookstore.exchange.direct
+    BOOKWEBREAD_DIRECT_ROUTINGKEY: test.bookwebread.bookstore.routingkey.direct
+    BOOKWEBREAD_DIRECT_QUEUE: test.bookwebread.bookstore.queue.direct

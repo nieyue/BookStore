@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.nieyue.dao.BookOrderDetailDao">
+<!-- 添加订单商品 -->
+<insert id="addBookOrderDetail" parameterType="BookOrderDetail" keyProperty="bookOrderDetailId" flushCache="true"  >  
+   INSERT IGNORE INTO
+   		  book_order_detail_tb 
+   		 (
+   		 billing_mode,
+   		 pay_type,
+   		 money,
+   		 real_money,
+   		 create_date,
+   		 update_date,
+   		 status,
+   		 book_order_id)
+   VALUES
+    	 (
+    	 #{billingMode},
+    	 #{payType},
+    	 #{money},
+    	 #{realMoney},
+    	 #{createDate},
+    	 #{updateDate},
+    	 #{status},
+    	 #{bookOrderId}
+    	 )  
+</insert>  
+<!-- 更新订单商品 -->
+<update id="updateBookOrderDetail" parameterType="BookOrderDetail" >  
+    UPDATE 
+    	book_order_detail_tb 
+    <set>
+	<if test="billingMode!=null">
+    	billing_mode=#{billingMode},	
+	</if>
+	<if test="payType!=null">
+    	pay_type=#{payType},
+    	</if>
+	<if test="money!=null">
+    	money=#{money},
+    	</if>
+	<if test="realMoney!=null">
+    	real_money=#{realMoney},
+    	</if>
+	<if test="createDate!=null">
+    	create_date=#{createDate},
+    	</if>
+	<if test="updateDate!=null">
+    	update_date=#{updateDate},
+    	</if>
+	<if test="status!=null">
+    	status=#{status},
+    	</if>
+	<if test="bookOrderId!=null">
+    	book_order_id=#{bookOrderId},
+    	</if>
+    </set>
+    WHERE
+    	 book_order_detail_id=#{bookOrderDetailId} 
+</update> 
+<!-- 删除订单商品-->
+<delete id="delBookOrderDetail"  parameterType="Integer" >  
+    DELETE FROM
+    	 book_order_detail_tb 
+    	 WHERE book_order_detail_id=#{bookOrderDetailId}
+</delete>  
+<!-- 加载订单商品-->
+<select id="loadBookOrderDetail" parameterType="Integer" resultType="BookOrderDetail" >
+SELECT 
+		 book_order_detail_id,
+	 	 billing_mode,
+   		 pay_type,
+   		 money,
+   		 real_money,
+   		 create_date,
+   		 update_date,
+   		 status,
+   		 book_order_id
+FROM book_order_detail_tb 
+WHERE book_order_detail_id=#{BookOrderDetailId}
+</select>
+
+<!-- 分页查询订单商品-->
+<select id="browsePagingBookOrderDetail" resultType="BookOrderDetail">  
+        SELECT
+	     book_order_detail_id,
+	 	 billing_mode,
+   		 pay_type,
+   		 money,
+   		 real_money,
+   		 create_date,
+   		 update_date,
+   		 status,
+   		 book_order_id
+	FROM book_order_detail_tb
+	<where>
+	<if test="bookOrderId!=null">
+	AND book_order_id=#{bookOrderId}
+	</if>
+	<if test="status!=null">
+    	status=#{status},
+    </if>
+	<if test="createDate!=null">
+	AND DATE(create_date)=DATE(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND DATE(update_date)=DATE(#{updateDate})
+	</if>
+	AND ${orderName} 
+	<if test="orderWay=='asc'">
+	<![CDATA[>=]]> 
+	</if>
+	<if test="orderWay=='desc'">
+	  <![CDATA[<= ]]>
+	</if>
+	(SELECT ${orderName} FROM book_order_detail_tb 
+	<where>
+	<if test="bookOrderId!=null">
+	AND book_order_id=#{bookOrderId}
+	</if>
+	<if test="status!=null">
+    	status=#{status},
+    </if>
+	<if test="createDate!=null">
+	AND DATE(create_date)=DATE(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND DATE(update_date)=DATE(#{updateDate})
+	</if>
+	</where>
+		ORDER BY 
+			${orderName}  ${orderWay}
+		LIMIT #{pageNum}, 1
+		) 
+	</where>
+	ORDER BY
+		${orderName}  ${orderWay}
+	LIMIT
+		#{pageSize}
+</select> 
+
+<!-- 统计记录条数 -->
+<select id="countAll"  resultType="int">  
+	SELECT
+	 	count(book_order_id)
+	FROM book_order_detail_tb
+	<where>
+	<if test="bookOrderId!=null">
+	AND book_order_id=#{bookOrderId}
+	</if>
+	<if test="status!=null">
+    	status=#{status},
+    </if>
+	<if test="createDate!=null">
+	AND DATE(create_date)=DATE(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND DATE(update_date)=DATE(#{updateDate})
+	</if>
+	</where>
+</select>   
+   
+ 
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.nieyue.dao.BookOrderDao">
+<!-- 添加商品 -->
+<insert id="addBookOrder" parameterType="BookOrder" keyProperty="bookOrderId" flushCache="true"  >  
+   INSERT IGNORE INTO
+   		  book_order_tb 
+   		 (
+   		 order_number,
+   		 create_date,
+   		 update_date,
+   		 acount_id)
+   VALUES
+    	 (
+    	 #{orderNumber},
+    	 #{createDate},
+    	 #{updateDate},
+    	 #{acountId}
+    	 )  
+</insert>  
+<!-- 更新商品 -->
+<update id="updateBookOrder" parameterType="BookOrder" >  
+    UPDATE 
+    	book_order_tb 
+    <set>
+    <if test="orderNumber!=null">
+    	order_number=#{orderNumber},
+    </if>
+    <if test="createDate!=null">
+    	create_date=#{createDate},
+    </if>
+    <if test="updateDate!=null">
+    	update_date=#{updateDate},
+    </if>
+    <if test="acountId!=null">
+    	acount_id=#{acountId},
+    </if>
+    </set>
+    WHERE
+    	book_order_id=#{bookOrderId} 
+</update> 
+<!-- 删除商品-->
+<delete id="delBookOrder"  parameterType="Integer" >  
+    DELETE FROM
+    	 book_order_tb 
+    	 WHERE book_order_id=#{bookOrderId}
+</delete>  
+<!-- 加载商品-->
+<select id="loadBookOrder" parameterType="Integer" resultType="BookOrder" >
+SELECT 
+		 book_order_id,
+	 	 order_number,
+   		 create_date,
+   		 update_date,
+   		 acount_id
+FROM book_order_tb 
+WHERE book_order_id=#{bookOrderId}
+</select>
+
+<!-- 分页查询商品-->
+<select id="browsePagingBookOrder" resultType="BookOrder">  
+        SELECT
+	     book_order_id,
+	 	 order_number,
+   		 create_date,
+   		 update_date,
+   		 acount_id
+	FROM book_order_tb
+	<where>
+	<if test="acountId!=null">
+	AND acount_id=#{acountId}
+	</if>
+	<if test="createDate!=null">
+	AND DATE(create_date)=DATE(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND DATE(update_date)=DATE(#{updateDate})
+	</if>
+	AND ${orderName} 
+	<if test="orderWay=='asc'">
+	<![CDATA[>=]]> 
+	</if>
+	<if test="orderWay=='desc'">
+	  <![CDATA[<= ]]>
+	</if>
+	(SELECT ${orderName} FROM book_order_tb 
+	<where>
+	<if test="acountId!=null">
+	AND acount_id=#{acountId}
+	</if>
+	<if test="createDate!=null">
+	AND DATE(create_date)=DATE(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND DATE(update_date)=DATE(#{updateDate})
+	</if>
+	</where>
+		ORDER BY 
+			${orderName}  ${orderWay}
+		LIMIT #{pageNum}, 1
+		) 
+	</where>
+	ORDER BY
+		${orderName}  ${orderWay}
+	LIMIT
+		#{pageSize}
+</select> 
+
+<!-- 统计记录条数 -->
+<select id="countAll"  resultType="int">  
+	SELECT
+	 	count(book_order_id)
+	FROM book_order_tb
+	<where>
+		<if test="acountId!=null">
+	AND acount_id=#{acountId}
+	</if>
+	<if test="createDate!=null">
+	AND DATE(create_date)=DATE(#{createDate})
+	</if>
+	<if test="updateDate!=null">
+	AND DATE(update_date)=DATE(#{updateDate})
+	</if>
+	</where>
+</select>   
+   
+ 
+</mapper>
