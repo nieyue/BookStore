@@ -2,6 +2,7 @@ package com.nieyue.service.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -10,12 +11,15 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nieyue.bean.BookOrderDetail;
+import com.nieyue.business.BookOrderBusiness;
 import com.nieyue.dao.BookOrderDetailDao;
 import com.nieyue.service.BookOrderDetailService;
 @Service
 public class BookOrderDetailServiceImpl implements BookOrderDetailService{
 	@Resource
 	BookOrderDetailDao bookOrderDetailDao;
+	@Resource
+	BookOrderBusiness bookOrderBusiness;
 	@Transactional(propagation=Propagation.REQUIRED)
 	@Override
 	public boolean addBookOrderDetail(BookOrderDetail bookOrderDetail) {
@@ -44,6 +48,13 @@ public class BookOrderDetailServiceImpl implements BookOrderDetailService{
 	@Override
 	public BookOrderDetail loadBookOrderDetail(Integer bookOrderDetailId) {
 		BookOrderDetail bookOrderDetail = bookOrderDetailDao.loadBookOrderDetail(bookOrderDetailId);
+			Map<String, Object> map = bookOrderBusiness.getBooOrderMoney(bookOrderDetail.getBillingMode(), bookOrderDetail.getPayType(), bookOrderDetail.getMoney(), bookOrderDetail.getRealMoney());
+			int day =  (int) map.get("day");
+			Date endDate = new Date(bookOrderDetail.getCreateDate().getTime()+day*24*3600*1000l);
+			if(endDate.before(new Date())){
+				bookOrderDetail.setStatus(5);
+				bookOrderDetailDao.updateBookOrderDetail(bookOrderDetail);
+			}
 		return bookOrderDetail;
 	}
 
@@ -81,6 +92,16 @@ public class BookOrderDetailServiceImpl implements BookOrderDetailService{
 				createDate,
 				updateDate,
 				pageNum-1, pageSize, orderName, orderWay);
+		for (int i = 0; i < l.size(); i++) {
+			BookOrderDetail bod = l.get(i);
+			Map<String, Object> map = bookOrderBusiness.getBooOrderMoney(bod.getBillingMode(), bod.getPayType(), bod.getMoney(), bod.getRealMoney());
+			int day =  (int) map.get("day");
+			Date endDate = new Date(bod.getCreateDate().getTime()+day*24*3600*1000l);
+			if(endDate.before(new Date())){
+				bod.setStatus(5);
+				bookOrderDetailDao.updateBookOrderDetail(bod);
+			}
+		}
 		return l;
 	}
 

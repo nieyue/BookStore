@@ -26,8 +26,15 @@ public class BookChapterServiceImpl implements BookChapterService{
 		boolean b=false;
 		bookChapter.setCreateDate(new Date());
 		bookChapter.setUpdateDate(new Date());
+		List<BookChapter> isexsist = bookChapterDao.browsePagingBookChapter(null, bookChapter.getNumber(), null, bookChapter.getBookId(), null, null, null, 0, Integer.MAX_VALUE, "book_chapter_id", "asc");
+		if(isexsist.size()>0){//章节已经存在
+			return b;
+		}
 		if(bookChapter.getStatus()==null||bookChapter.getStatus().equals("")){
 			bookChapter.setStatus(1);
+		}
+		if(bookChapter.getCost()==null||bookChapter.getCost().equals("")){
+			bookChapter.setCost(0);//默认为0，免费
 		}
 		if(bookChapter.getContent()!=null&&!bookChapter.getContent().equals("")){
 			Long wordNumber=(long) bookChapter.getContent().length();
@@ -95,6 +102,7 @@ public class BookChapterServiceImpl implements BookChapterService{
 
 	@Override
 	public int countAll(
+			Integer cost,
 			Integer number,
 			Long wordNumber,
 			Integer bookId,
@@ -102,12 +110,13 @@ public class BookChapterServiceImpl implements BookChapterService{
 			Date updateDate,
 			Integer status
 			) {
-		int c = bookChapterDao.countAll(number,wordNumber,bookId,createDate,updateDate,status);
+		int c = bookChapterDao.countAll(cost,number,wordNumber,bookId,createDate,updateDate,status);
 		return c;
 	}
 
 	@Override
 	public List<BookChapter> browsePagingBookChapter(
+			Integer cost,
 			Integer number,
 			Long wordNumber,
 			Integer bookId,
@@ -123,6 +132,7 @@ public class BookChapterServiceImpl implements BookChapterService{
 			pageSize=0;//没有数据
 		}
 		List<BookChapter> l = bookChapterDao.browsePagingBookChapter(
+				cost,
 				number,
 				wordNumber,
 				bookId,createDate,updateDate,status,
@@ -133,6 +143,11 @@ public class BookChapterServiceImpl implements BookChapterService{
 	public BookChapter loadSmallBookChapter(Integer bookChapterId) {
 		BookChapter r = bookChapterDao.loadBookChapter(bookChapterId);
 		return r;
+	}
+	@Override
+	public BookChapter readBookChapter(Integer bookId, Integer number) {
+		BookChapter bc = bookChapterDao.readBookChapter(bookId, number);
+		return bc;
 	}
 
 	

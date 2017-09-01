@@ -56,9 +56,9 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         sessionAcount = (Acount) request.getSession().getAttribute("acount");
         sessionRole = (Role) request.getSession().getAttribute("role");
         }
-        Integer a=1;
-        int b=1;
-        if(a.equals(b)){
+        Integer i=1;
+        Integer j=1;
+        if(i.equals(j)){
         	return true;
         }
         
@@ -77,6 +77,10 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         		||request.getRequestURI().indexOf("book/list")>-1
         		||request.getRequestURI().indexOf("book/loadSmall")>-1
         		||method.getName().equals("loadBook")
+        		//bookCollect
+        		||request.getRequestURI().indexOf("bookCollect/count")>-1
+        		||request.getRequestURI().indexOf("bookCollect/list")>-1
+        		||method.getName().equals("loadBookCollect")
         		//bookChapter
         		||request.getRequestURI().indexOf("bookChapter/count")>-1
         		||request.getRequestURI().indexOf("bookChapter/list")>-1
@@ -96,8 +100,7 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         	//超级管理员
         	if(sessionRole.getName().equals("超级管理员")
         			||sessionRole.getName().equals("运营管理员")
-        			||sessionRole.getName().equals("编辑管理员")
-        			||sessionRole.getName().equals("商城管理员")
+        			||sessionRole.getName().equals("书城管理员")
         			){
         		return true;
         	}
@@ -122,6 +125,19 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         				|| request.getRequestURI().indexOf("/book/add")>-1
         				|| request.getRequestURI().indexOf("/book/update")>-1
         				){
+        			throw new MySessionException();
+        		}
+        		//书收藏不许删除/增加/修改
+        		if( request.getRequestURI().indexOf("/bookCollect/delete")>-1 
+        				|| request.getRequestURI().indexOf("/bookCollect/add")>-1
+        				|| request.getRequestURI().indexOf("/bookCollect/update")>-1
+        				){
+        			//增加/删除自身
+        			if( (request.getRequestURI().indexOf("/bookCollect/add")>-1
+        					||request.getRequestURI().indexOf("/bookCollect/delete")>-1)
+        					&& request.getParameter("acountId").equals(sessionAcount.getAcountId().toString())){
+        				return true; 
+        			}
         			throw new MySessionException();
         		}
         		//书章节不许删除/增加/修改

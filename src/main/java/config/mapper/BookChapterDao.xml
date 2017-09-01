@@ -12,6 +12,7 @@
    		 title,
    		 word_number,
    		 content,
+   		 cost,
    		 status,
    		 book_id,
    		 create_date,
@@ -22,6 +23,7 @@
     	 #{title},
     	 #{wordNumber},
     	 #{content},
+    	 #{cost},
     	 #{status},
     	 #{bookId},
     	 #{createDate},
@@ -43,6 +45,9 @@
     </if>
     <if test="content!=null">
     	content=#{content},
+    </if>
+    <if test="cost!=null">
+    	cost=#{cost},
     </if>
     <if test="status!=null">
     	status=#{status},
@@ -66,6 +71,23 @@
     	 book_chapter_tb 
     	 WHERE book_chapter_id=#{bookChapterId}
 </delete>  
+<!-- 阅读书章节-->
+<select id="readBookChapter" parameterType="Integer" resultType="BookChapter" >
+SELECT 
+		 book_chapter_id,
+	 	 number,
+   		 title,
+   		 word_number,
+   		 content,
+   		 cost,
+   		 status,
+   		 book_id,
+   		 create_date,
+   		 update_date
+FROM book_chapter_tb 
+WHERE book_id=#{bookId}
+AND number=#{number}
+</select>
 <!-- 加载书章节-->
 <select id="loadBookChapter" parameterType="Integer" resultType="BookChapter" >
 SELECT 
@@ -74,6 +96,7 @@ SELECT
    		 title,
    		 word_number,
    		 content,
+   		 cost,
    		 status,
    		 book_id,
    		 create_date,
@@ -89,6 +112,7 @@ SELECT
    		 title,
    		 word_number,
    		 <!-- content, -->
+   		 cost,
    		 status,
    		 book_id,
    		 create_date,
@@ -105,12 +129,16 @@ WHERE book_chapter_id=#{bookChapterId}
    		 title,
    		 word_number,
    		 <!-- content, -->
+   		 cost,
    		 status,
    		 book_id,
    		 create_date,
    		 update_date
 	FROM book_chapter_tb
 	<where>
+	<if test="cost!=null">
+	AND cost=#{cost}
+	</if>
 	<if test="number!=null">
 	AND number=#{number}
 	</if>
@@ -138,6 +166,9 @@ WHERE book_chapter_id=#{bookChapterId}
 	</if>
 	(SELECT ${orderName} FROM book_chapter_tb 
 	<where>
+	<if test="cost!=null">
+	AND cost=#{cost}
+	</if>
 	<if test="number!=null">
 	AND number=#{number}
 	</if>
@@ -174,6 +205,9 @@ WHERE book_chapter_id=#{bookChapterId}
 	 	count(book_chapter_id)
 	FROM book_chapter_tb
 	<where>
+	<if test="cost!=null">
+	AND cost=#{cost}
+	</if>
 	<if test="number!=null">
 	AND number=#{number}
 	</if>

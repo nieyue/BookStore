@@ -36,6 +36,10 @@ public class BookChapter implements Serializable{
 	 */
 	private String content;
 	/**
+	 * 费用，0免费，1收费
+	 */
+	private Integer cost;
+	/**
 	 * 下架0,上架1
 	 */
 	private Integer status;
@@ -51,23 +55,25 @@ public class BookChapter implements Serializable{
 	 * 书id,外键
 	 */
 	private Integer bookId;
+	public BookChapter() {
+		super();
+	}
 	
 	public BookChapter(Integer bookChapterId, Integer number, String title, Long wordNumber, String content,
-			Integer status, Date createDate, Date updateDate, Integer bookId) {
+			Integer cost, Integer status, Date createDate, Date updateDate, Integer bookId) {
 		super();
 		this.bookChapterId = bookChapterId;
 		this.number = number;
 		this.title = title;
 		this.wordNumber = wordNumber;
 		this.content = content;
+		this.cost = cost;
 		this.status = status;
 		this.createDate = createDate;
 		this.updateDate = updateDate;
 		this.bookId = bookId;
 	}
-	public BookChapter() {
-		super();
-	}
+
 	public Integer getBookChapterId() {
 		return bookChapterId;
 	}
@@ -124,6 +130,12 @@ public class BookChapter implements Serializable{
 	}
 	public void setWordNumber(Long wordNumber) {
 		this.wordNumber = wordNumber;
+	}
+	public Integer getCost() {
+		return cost;
+	}
+	public void setCost(Integer cost) {
+		this.cost = cost;
 	}
 	
 }

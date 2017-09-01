@@ -25,8 +25,11 @@ public interface BookChapterDao {
 	public BookChapter loadBookChapter(Integer bookChapterId);	
 	/** 装载Small书章节 */	
 	public BookChapter loadSmallBookChapter(Integer bookChapterId);	
+	/** 阅读书章节 */	
+	public BookChapter readBookChapter(@Param("bookId")Integer bookId,@Param("number")Integer number);	
 	/** 书章节总共数目 */	
 	public int countAll(
+			@Param("cost")Integer cost,
 			@Param("number")Integer number,
 			@Param("wordNumber")Long wordNumber,
 			@Param("bookId")Integer bookId,
@@ -36,6 +39,7 @@ public interface BookChapterDao {
 			);	
 	/** 分页书章节信息 */
 	public List<BookChapter> browsePagingBookChapter(
+			@Param("cost")Integer cost,
 			@Param("number")Integer number,
 			@Param("wordNumber")Long wordNumber,
 			@Param("bookId")Integer bookId,

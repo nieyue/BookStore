@@ -41,6 +41,7 @@ public class BookChapterController {
 	 */
 	@RequestMapping(value = "/list", method = {RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody StateResultList browsePagingBookChapter(
+			@RequestParam(value="cost",required=false)Integer cost,
 			@RequestParam(value="number",required=false)Integer number,
 			@RequestParam(value="wordNumber",required=false)Long wordNumber,
 			@RequestParam(value="bookId",required=false)Integer bookId,
@@ -52,7 +53,7 @@ public class BookChapterController {
 			@RequestParam(value="orderName",required=false,defaultValue="book_chapter_id") String orderName,
 			@RequestParam(value="orderWay",required=false,defaultValue="desc") String orderWay)  {
 			List<BookChapter> list = new ArrayList<BookChapter>();
-			list= bookChapterService.browsePagingBookChapter(number,wordNumber,bookId,createDate,updateDate,status,pageNum, pageSize, orderName, orderWay);
+			list= bookChapterService.browsePagingBookChapter(cost,number,wordNumber,bookId,createDate,updateDate,status,pageNum, pageSize, orderName, orderWay);
 			if(list.size()>0){
 				return ResultUtil.getSlefSRSuccessList(list);
 			}else{
@@ -92,6 +93,7 @@ public class BookChapterController {
 	 */
 	@RequestMapping(value = "/count", method = {RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody int countAll(
+			@RequestParam(value="cost",required=false)Integer cost,
 			@RequestParam(value="number",required=false)Integer number,
 			@RequestParam(value="wordNumber",required=false)Long wordNumber,
 			@RequestParam(value="bookId",required=false)Integer bookId,
@@ -99,7 +101,7 @@ public class BookChapterController {
 			@RequestParam(value="updateDate",required=false)Date updateDate,
 			@RequestParam(value="status",required=false)Integer status,
 			HttpSession session)  {
-		int count = bookChapterService.countAll(number,wordNumber,bookId,createDate,updateDate,status);
+		int count = bookChapterService.countAll(cost,number,wordNumber,bookId,createDate,updateDate,status);
 		return count;
 	}
 	/**
@@ -116,6 +118,25 @@ public class BookChapterController {
 			}else{
 				return ResultUtil.getSlefSRFailList(list);
 			}
+	}
+	
+	/**
+	 * 阅读节单个加载
+	 * @return
+	 */
+	@RequestMapping(value = "/read", method = {RequestMethod.GET,RequestMethod.POST})
+	public  StateResultList readBookChapter(
+			@RequestParam("bookId") Integer bookId,
+			@RequestParam("number") Integer number,
+			HttpSession session)  {
+		List<BookChapter> list = new ArrayList<BookChapter>();
+		BookChapter bookChapter = bookChapterService.readBookChapter(bookId,number);
+		if(bookChapter!=null &&!bookChapter.equals("")){
+			list.add(bookChapter);
+			return ResultUtil.getSlefSRSuccessList(list);
+		}else{
+			return ResultUtil.getSlefSRFailList(list);
+		}
 	}
 	
 }

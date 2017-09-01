@@ -8,8 +8,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -96,7 +96,7 @@ public class BookController {
 	 * @return
 	 */
 	@RequestMapping(value = "/update", method = {RequestMethod.GET,RequestMethod.POST})
-	public @ResponseBody StateResult updateBook(@ModelAttribute Book book,HttpSession session)  {
+	public @ResponseBody StateResult updateBook(@RequestBody Book book,HttpSession session)  {
 		boolean um = bookService.updateBook(book);
 		return ResultUtil.getSR(um);
 	}
@@ -105,7 +105,7 @@ public class BookController {
 	 * @return 
 	 */
 	@RequestMapping(value = "/add", method = {RequestMethod.GET,RequestMethod.POST})
-	public @ResponseBody StateResult addBook(@ModelAttribute Book book, HttpSession session) {
+	public @ResponseBody StateResult addBook(@RequestBody Book book, HttpSession session) {
 		boolean am = bookService.addBook(book);
 		return ResultUtil.getSR(am);
 	}

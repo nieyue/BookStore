@@ -70,7 +70,7 @@ public class BookOrderBusiness {
 				day=0;
 			}
 		}
-		endDate=new Date(startDate.getTime()+day*24*3600*1000);//结束时间
+		endDate=new Date(startDate.getTime()+day*24*3600*1000l);//结束时间
 		map.put("day",day );
 		map.put("money", money);
 		map.put("realMoney", realMoney);

@@ -18,7 +18,7 @@ PRIMARY KEY (book_cate_id)
 CREATE TABLE book_tb(
 book_id int(11) NOT NULL AUTO_INCREMENT COMMENT '书id',
 title varchar(255) COMMENT '书名称',
-summary varchar(255) COMMENT '简介',
+summary longtext COMMENT '简介',
 author varchar(255) COMMENT '作者',
 img_address varchar(255) COMMENT '封面',
 chapter_number int(11) DEFAULT 0 COMMENT '章节数',
@@ -46,6 +46,17 @@ INDEX INDEX_UPDATEDATE (update_date) USING BTREE,
 INDEX INDEX_STATUS (status) USING BTREE
 )ENGINE = InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='书表';
 
+#创建书收藏表 
+CREATE TABLE book_collect_tb(
+collect_id int(11) NOT NULL AUTO_INCREMENT COMMENT '书收藏id',
+create_date datetime COMMENT '创建时间',
+book_id int(11) COMMENT '书id外键',
+acount_id int(11) COMMENT '收藏人id外键',
+PRIMARY KEY (collect_id),
+INDEX INDEX_BOOKID (book_id) USING BTREE,
+INDEX INDEX_ACOUNTID (acount_id) USING BTREE
+)ENGINE = InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='书收藏表';
+
 #创建书章节表 
 CREATE TABLE book_chapter_tb(
 book_chapter_id int(11) NOT NULL AUTO_INCREMENT COMMENT '书章节id',
@@ -53,11 +64,13 @@ number int(11) COMMENT '书章节章数',
 word_number bigint(20) DEFAULT 0 COMMENT '字数',
 title varchar(255) COMMENT '书章节名称',
 content longtext COMMENT '内容',
+cost tinyint(4) DEFAULT 0 COMMENT '费用，默认为0免费，1为收费',
 status tinyint(4) DEFAULT 1 COMMENT '下架0,上架1',
 book_id int(11) COMMENT '书id,外键',
 create_date datetime  COMMENT '书创建时间',
 update_date datetime  COMMENT '书更新时间',
 PRIMARY KEY (book_chapter_id),
+INDEX INDEX_COST (cost) USING BTREE,
 INDEX INDEX_NUMBER (number) USING BTREE,
 INDEX INDEX_WORDNUMBER (word_number) USING BTREE,
 INDEX INDEX_BOOKID (book_id) USING BTREE,

@@ -17,12 +17,15 @@ public interface BookChapterService {
 	public boolean delBookChapter(Integer bookChapterId) ;
 	/** 更新书章节*/	
 	public boolean updateBookChapter(BookChapter bookChapter);
+	/** 阅读书章节 */	
+	public BookChapter readBookChapter(Integer bookId,Integer number);
 	/** 装载书章节 */	
 	public BookChapter loadBookChapter(Integer bookChapterId);
 	/** 装载Small书章节 */	
 	public BookChapter loadSmallBookChapter(Integer bookChapterId);
 	/** 书章节总共数目 */	
 	public int countAll(
+			Integer cost,
 			Integer number,
 			Long wordNumber,
 			Integer bookId,
@@ -32,6 +35,7 @@ public interface BookChapterService {
 			);
 	/** 分页书章节信息 */
 	public List<BookChapter> browsePagingBookChapter(
+			Integer cost,
 			Integer number,
 			Long wordNumber,
 			Integer bookId,

@@ -28,7 +28,7 @@ import com.nieyue.util.StateResultList;
  *
  */
 @RestController
-@RequestMapping("/BookOrderDetail")
+@RequestMapping("/bookOrderDetail")
 public class BookOrderDetailController {
 	@Resource
 	private BookOrderDetailService bookOrderDetailService;

@@ -13,11 +13,11 @@ spring:
    datasource:
      name: master
      driver-class-name: com.mysql.jdbc.Driver
-     url: jdbc:mysql://39.108.60.100:3306/book_store_db
+     url: jdbc:mysql://120.77.253.90:3306/book_store_db
      username: root
      password: liliu
    redis:
-     host: 39.108.60.100
+     host: 120.77.253.90
      password: liliu
      port: 6379 
      database: 1
