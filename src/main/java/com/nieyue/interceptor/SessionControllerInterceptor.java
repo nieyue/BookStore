@@ -56,11 +56,11 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         sessionAcount = (Acount) request.getSession().getAttribute("acount");
         sessionRole = (Role) request.getSession().getAttribute("role");
         }
-        Integer i=1;
-        Integer j=1;
-        if(i.equals(j)){
-        	return true;
-        }
+//        Integer i=1;
+//        Integer j=1;
+//        if(i.equals(j)){
+//        	return true;
+//        }
         
         if(
         		request.getServletPath().equals("/")
