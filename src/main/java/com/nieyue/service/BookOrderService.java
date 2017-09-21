@@ -13,6 +13,8 @@ import com.nieyue.bean.BookOrder;
 public interface BookOrderService {
 	/** 新增书订单 */	
 	public boolean addBookOrder(BookOrder bookOrder) ;	
+	/** 新增书订单调用 */	
+	public String addBookOrderSynchronization(BookOrder bookOrder) ;	
 	/** 删除书订单 */	
 	public boolean delBookOrder(Integer bookOrderId) ;
 	/** 更新书订单*/	

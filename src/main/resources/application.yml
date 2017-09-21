@@ -34,11 +34,11 @@ spring:
   session:
     store-type: redis      
   profiles:
-   active: dev
-   #active: prod
+   #active: dev
+   active: prod
   rabbitmq:
-    addresses: 118.190.133.146
-#    addresses: 39.108.60.100
+   # addresses: 118.190.133.146
+    addresses: 120.77.253.90
     username: nieyue
     password: liliu
     listener:

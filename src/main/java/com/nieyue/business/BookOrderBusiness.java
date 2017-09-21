@@ -43,7 +43,8 @@ public class BookOrderBusiness {
 			day=30;
 			if(payType==1){//真钱支付
 				money=0.0;
-				realMoney=10.0;
+				//realMoney=10.0;
+				realMoney=0.01;
 			}else if(payType==2){//积分支付
 				money=1000.0;
 				realMoney=0.0;

@@ -16,11 +16,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nieyue.bean.BookOrder;
+import com.nieyue.bean.BookOrderDetail;
 import com.nieyue.rabbitmq.confirmcallback.Sender;
 import com.nieyue.service.BookOrderService;
 import com.nieyue.util.ResultUtil;
 import com.nieyue.util.StateResult;
 import com.nieyue.util.StateResultList;
+
+import net.sf.json.JSONObject;
 
 
 /**
@@ -75,10 +78,60 @@ public class BookOrderController {
 	 */
 	@RequestMapping(value = "/add", method = {RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody StateResult addBookOrder(@RequestBody BookOrder bookOrder, HttpSession session) {
-		//boolean am = bookOrderService.addBookOrder(bookOrder);
+		//boolean am = bookOrderService.addBookOrderSynchronization(bookOrder);
 		sender.sendBookOrder(bookOrder);
 		return ResultUtil.getSR(true);
 	}
+	/**
+	 * 书订单支付调用
+	 * @return 
+	 */
+	@RequestMapping(value = "/payment", method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody StateResultList paymentBookOrder(@RequestBody BookOrder bookOrder, HttpSession session) {
+		String result = bookOrderService.addBookOrderSynchronization(bookOrder);
+		//sender.sendBookOrder(bookOrder);
+		List<String> list=new ArrayList<String>();
+		if(result!=null&&!result.equals("")){			
+		list.add(result);
+		return ResultUtil.getSlefSRSuccessList(list);
+		}
+		return ResultUtil.getSlefSRFailList(list);
+	}
+	/**
+	 * 书订单支付回调
+	 * @return 
+	 */
+	@RequestMapping(value = "/paymentNotifyUrl", method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody StateResult notifyUrlBookOrder(@RequestParam("params")String params, HttpSession session) {
+		JSONObject json = JSONObject.fromObject(params);
+		BookOrder bookOrder = (BookOrder) JSONObject.toBean(json, BookOrder.class);
+		int bodls = bookOrder.getBookOrderDetailList().size();
+		List<BookOrderDetail> bodl=new ArrayList<BookOrderDetail>();
+		for (int i = 0; i < bodls; i++) {
+			 Object bodobj = bookOrder.getBookOrderDetailList().get(i);
+			 JSONObject bodjson = JSONObject.fromObject(bodobj);
+			 BookOrderDetail bookOrderDetail23 = (BookOrderDetail) JSONObject.toBean(bodjson, BookOrderDetail.class);
+			 bodl.add(bookOrderDetail23);
+		}
+		bookOrder.getBookOrderDetailList().clear();
+		bookOrder.getBookOrderDetailList().addAll(bodl);
+		boolean b = bookOrderService.addBookOrder(bookOrder);
+		//sender.sendBookOrder(bookOrder);
+		return ResultUtil.getSR(b);
+	}
+	/**
+	 * 书订单支付
+	 * @return 
+	 */
+	/*@RequestMapping(value = "/payment", method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody StateResult addBookPayment(@RequestBody List<Integer> bookOrderDetailIdList, HttpSession session) {
+		if(bookOrderDetailIdList.size()<=0){
+			return ResultUtil.getSR(false);
+		}
+		//bookOrderService.addBookOrder(bookOrder)
+		sender.sendBookPayment(bookOrderDetailIdList);
+		return ResultUtil.getSR(true);
+	}*/
 	/**
 	 * 书订单删除
 	 * @return

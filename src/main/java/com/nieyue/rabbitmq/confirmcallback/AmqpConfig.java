@@ -23,11 +23,20 @@ public class AmqpConfig {
 	 * 书订单
 	 */
 	@Value("${myPugin.rabbitmq.BOOKORDER_DIRECT_EXCHANGE}")
-    public  String BOOKORDER_DIRECT_EXCHANGE ;  
+	public  String BOOKORDER_DIRECT_EXCHANGE ;  
 	@Value("${myPugin.rabbitmq.BOOKORDER_DIRECT_ROUTINGKEY}")
-    public String BOOKORDER_DIRECT_ROUTINGKEY;  
+	public String BOOKORDER_DIRECT_ROUTINGKEY;  
 	@Value("${myPugin.rabbitmq.BOOKORDER_DIRECT_QUEUE}")
-    public  String BOOKORDER_DIRECT_QUEUE; 
+	public  String BOOKORDER_DIRECT_QUEUE; 
+	/**
+	 * 书支付
+	 */
+	@Value("${myPugin.rabbitmq.BOOKPAYMENT_DIRECT_EXCHANGE}")
+    public  String BOOKPAYMENT_DIRECT_EXCHANGE ;  
+	@Value("${myPugin.rabbitmq.BOOKPAYMENT_DIRECT_ROUTINGKEY}")
+    public String BOOKPAYMENT_DIRECT_ROUTINGKEY;  
+	@Value("${myPugin.rabbitmq.BOOKPAYMENT_DIRECT_QUEUE}")
+    public  String BOOKPAYMENT_DIRECT_QUEUE; 
 	/**
 	 *书订单流水
 	 */
@@ -65,7 +74,7 @@ public class AmqpConfig {
      * 设置交换机类型
      */   
     @Bean  
-    public DirectExchange BookOrderDirectExchange() {  
+    public DirectExchange bookOrderDirectExchange() {  
         /** 
          * DirectExchange:按照routingkey分发到指定队列 
          * TopicExchange:多关键字匹配 
@@ -79,17 +88,51 @@ public class AmqpConfig {
      * 设置队列
      */
     @Bean  
-    public Queue BookOrderDirectQueue() {  
+    public Queue bookOrderDirectQueue() {  
         return new Queue(BOOKORDER_DIRECT_QUEUE);  
     }
     /*
      * 设置绑定
      */
     @Bean  
-    public Binding BookOrderDirectBinding() {  
+    public Binding bookOrderDirectBinding() {  
         /** 将队列绑定到交换机 */  
-        return BindingBuilder.bind(BookOrderDirectQueue()).to(BookOrderDirectExchange()).with(BOOKORDER_DIRECT_ROUTINGKEY);  
+        return BindingBuilder.bind(bookOrderDirectQueue()).to(bookOrderDirectExchange()).with(BOOKORDER_DIRECT_ROUTINGKEY);  
     } 
+    
+    /** 
+     *书支付
+     */  
+    /*
+     * 设置交换机类型
+     */   
+    @Bean  
+    public DirectExchange bookPaymentDirectExchange() {  
+        /** 
+         * DirectExchange:按照routingkey分发到指定队列 
+         * TopicExchange:多关键字匹配 
+         * FanoutExchange: 将消息分发到所有的绑定队列，无routingkey的概念 
+         * HeadersExchange ：通过添加属性key-value匹配 
+         */  
+    	DirectExchange de = new DirectExchange(BOOKPAYMENT_DIRECT_EXCHANGE);
+        return de;
+    }
+    /*
+     * 设置队列
+     */
+    @Bean  
+    public Queue bookPaymentDirectQueue() {  
+        return new Queue(BOOKPAYMENT_DIRECT_QUEUE);  
+    }
+    /*
+     * 设置绑定
+     */
+    @Bean  
+    public Binding bookPaymentDirectBinding() {  
+        /** 将队列绑定到交换机 */  
+        return BindingBuilder.bind(bookPaymentDirectQueue()).to(bookPaymentDirectExchange()).with(BOOKPAYMENT_DIRECT_ROUTINGKEY);  
+    } 
+    
     
     /** 
      *书订单流水
@@ -115,6 +158,7 @@ public class AmqpConfig {
     	/** 将队列绑定到交换机 */  
     	return BindingBuilder.bind(bookOrderFlowWaterDirectQueue()).to(bookOrderFlowWaterDirectExchange()).with(BOOKORDERFLOWWATER_DIRECT_ROUTINGKEY);  
     } 
+    
     
     /** 
      *书web阅读

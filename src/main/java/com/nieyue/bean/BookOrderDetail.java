@@ -124,5 +124,11 @@ public class BookOrderDetail implements Serializable{
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+	@Override
+	public String toString() {
+		return "BookOrderDetail [bookOrderDetailId=" + bookOrderDetailId + ", billingMode=" + billingMode + ", payType="
+				+ payType + ", money=" + money + ", realMoney=" + realMoney + ", createDate=" + createDate
+				+ ", updateDate=" + updateDate + ", status=" + status + ", bookOrderId=" + bookOrderId + "]";
+	}
 	
 }

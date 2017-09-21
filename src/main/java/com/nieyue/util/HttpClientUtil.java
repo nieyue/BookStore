@@ -1,7 +1,6 @@
 package com.nieyue.util;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -15,8 +14,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-
-import com.nieyue.weixin.ssl.ClientCustomSSL;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -107,58 +104,7 @@ public class HttpClientUtil {
 		    }
 		    return result;
 	  }
-	  /**
-	   * 带证书的post请求json
-	   * @param url
-	   * @param json
-	   * @return
-	 * @throws Exception 
-	   */
-	  
-	  public static JSONObject doSSLPostJson(String url,String json) throws Exception{
-		  CloseableHttpClient client = ClientCustomSSL.getCloseableHttpClient();
-	    HttpPost post = new HttpPost(url);
-	    JSONObject response = null;
-	    try {
-	      StringEntity s = new StringEntity(json.toString(),"utf-8");
-	      post.setEntity(s);
-	      CloseableHttpResponse res = client.execute(post);
-	      if(res.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
-	        String result = EntityUtils.toString(res.getEntity(),"utf-8");// 返回json格式：
-	        response = JSONObject.fromObject(result);
-	      }
-	    } catch (Exception e) {
-	      throw new RuntimeException(e);
-	    }
-	    return response;
-	  }
-	  /**
-	   * 带证书的post请求json
-	   * @param url
-	   * @param xml
-	   * @return
-	 * @throws Exception 
-	   */
-	  
-	  public static JSONObject doSSLXmlPostJson(String url,String xml) throws Exception{
-		  CloseableHttpClient client = ClientCustomSSL.getCloseableHttpClient();
-	    HttpPost post = new HttpPost(url);
-	    JSONObject response = null;
-	    try {
-	      StringEntity s = new StringEntity(xml);
-	      post.setEntity(s);
-	      CloseableHttpResponse res = client.execute(post);
-	      if(res.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
-	        String result = EntityUtils.toString(res.getEntity() ,"utf-8");// 返回json格式：
-	        Map<String, Object> map = MyDom4jUtil.xmlStrToMap(result);
-	        response=JSONObject.fromObject(map);
-	        return response;
-	      }
-	    } catch (Exception e) {
-	      throw new RuntimeException(e);
-	    }
-	    return response;
-	  }
+	
 	  /**
 	   * post请求 String
 	   * @param url
@@ -183,31 +129,7 @@ public class HttpClientUtil {
 		  }
 		  return response;
 	  }
-	  /**
-	   * 带证书的post 获取xml
-	   * @param url
-	   * @param xml
-	   * @return
-	   * @throws Exception
-	   */
-	  public static String doSSLPostXml(String url,String xml) throws Exception{
-		  CloseableHttpClient client = ClientCustomSSL.getCloseableHttpClient();
-		  HttpPost post = new HttpPost(url);
-		  String response = null;
-		  try {
-			  StringEntity s = new StringEntity(xml,"utf-8");
-			  post.setEntity(s);
-			  System.out.println(s);
-			  CloseableHttpResponse res = client.execute(post);
-			  if(res.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
-				  response = EntityUtils.toString(res.getEntity(),"utf-8");// 返回xml格式：
-				  //response = JSONObject.fromObject(result);
-			  }
-		  } catch (Exception e) {
-			  throw new RuntimeException(e);
-		  }
-		  return response;
-	  }
+	
 	  /**
 	   * 不带证书的post 获取xml
 	   * @param url

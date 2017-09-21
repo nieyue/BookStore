@@ -33,10 +33,15 @@ myPugin:
   location: /home/config/thirdParty.properties
   requestAuth: requestAuthProd
   sevenSecondsDomainUrl: http://www.newzhuan.cn
+  bookStoreDomainUrl: http://book.newzhuan.cn
+  paymentSystemDomainUrl: http://payment.newzhuan.cn
   rabbitmq:
     BOOKORDER_DIRECT_EXCHANGE: bookorder.bookstore.exchange.direct
     BOOKORDER_DIRECT_ROUTINGKEY: bookorder.bookstore.routingkey.direct
     BOOKORDER_DIRECT_QUEUE: bookorder.bookstore.queue.direct
+    BOOKPAYMENT_DIRECT_EXCHANGE: test.bookpayment.bookstore.exchange.direct
+    BOOKPAYMENT_DIRECT_ROUTINGKEY: test.bookpayment.bookstore.routingkey.direct
+    BOOKPAYMENT_DIRECT_QUEUE: test.bookpayment.bookstore.queue.direct
     BOOKORDERFLOWWATER_DIRECT_EXCHANGE: bookorderflowwater.bookstore.exchange.direct
     BOOKORDERFLOWWATER_DIRECT_ROUTINGKEY: bookorderflowwater.bookstore.routingkey.direct
     BOOKORDERFLOWWATER_DIRECT_QUEUE: bookorderflowwater.bookstore.queue.direct

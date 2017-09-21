@@ -91,6 +91,16 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         		||method.getName().equals("loadBookOrder")
         		//bookOrderDetail
         		||method.getName().equals("loadBookOrderDetail")
+        		//dailyData
+        		||request.getRequestURI().indexOf("dailyData/count")>-1
+        		||request.getRequestURI().indexOf("dailyData/statisticsDailyData")>-1
+        		||request.getRequestURI().indexOf("dailyData/list")>-1
+        		||method.getName().equals("loadDailyData")
+        		//data
+        		||request.getRequestURI().indexOf("data/count")>-1
+        		||request.getRequestURI().indexOf("data/statisticsData")>-1
+        		||request.getRequestURI().indexOf("data/list")>-1
+        		||method.getName().equals("loadData")
        
         		){
         	return true;
@@ -150,10 +160,15 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         		//书订单不许删除/增加/修改
         		if( request.getRequestURI().indexOf("/bookOrder/delete")>-1 
         				|| request.getRequestURI().indexOf("/bookOrder/add")>-1
+        				|| request.getRequestURI().indexOf("/bookOrder/payment")>-1
         				|| request.getRequestURI().indexOf("/bookOrder/update")>-1
         				){
         			//增加自身
-        			if( request.getRequestURI().indexOf("/bookOrder/add")>-1 && request.getParameter("acountId").equals(sessionAcount.getAcountId().toString())){
+        			if( 
+        					(request.getRequestURI().indexOf("/bookOrder/add")>-1
+        					||request.getRequestURI().indexOf("/bookOrder/payment")>-1
+        					)
+        					&& request.getParameter("acountId").equals(sessionAcount.getAcountId().toString())){
         				return true;
         			}
         			throw new MySessionException();
@@ -170,6 +185,18 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         			if( request.getParameter("acountId").equals(sessionAcount.getAcountId().toString())){
         				return true;
         			}
+        			throw new MySessionException();
+        		}
+        		//文章时间段数据不许删除/修改/增加
+        		if( request.getRequestURI().indexOf("/data/delete")>-1 
+        				|| request.getRequestURI().indexOf("/data/update")>-1 
+        				|| request.getRequestURI().indexOf("/data/add")>-1){
+        			throw new MySessionException();
+        		}
+        		//文章日数据不许删除/修改/增加
+        		if( request.getRequestURI().indexOf("/dailyData/delete")>-1 
+        				|| request.getRequestURI().indexOf("/dailyData/update")>-1 
+        				|| request.getRequestURI().indexOf("/dailyData/add")>-1){
         			throw new MySessionException();
         		}
         		return true;

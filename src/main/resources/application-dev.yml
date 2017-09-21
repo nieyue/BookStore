@@ -33,10 +33,15 @@ myPugin:
   location: c://config/thirdParty.properties
   requestAuth: requestAuthDev
   sevenSecondsDomainUrl: http://192.168.7.111
+  bookStoreDomainUrl: http://192.168.7.111:8082
+  paymentSystemDomainUrl: http://192.168.7.111:8888
   rabbitmq:
     BOOKORDER_DIRECT_EXCHANGE: test.bookorder.bookstore.exchange.direct
     BOOKORDER_DIRECT_ROUTINGKEY: test.bookorder.bookstore.routingkey.direct
     BOOKORDER_DIRECT_QUEUE: test.bookorder.bookstore.queue.direct
+    BOOKPAYMENT_DIRECT_EXCHANGE: test.bookpayment.bookstore.exchange.direct
+    BOOKPAYMENT_DIRECT_ROUTINGKEY: test.bookpayment.bookstore.routingkey.direct
+    BOOKPAYMENT_DIRECT_QUEUE: test.bookpayment.bookstore.queue.direct
     BOOKORDERFLOWWATER_DIRECT_EXCHANGE: test.bookorderflowwater.bookstore.exchange.direct
     BOOKORDERFLOWWATER_DIRECT_ROUTINGKEY: test.bookorderflowwater.bookstore.routingkey.direct
     BOOKORDERFLOWWATER_DIRECT_QUEUE: test.bookorderflowwater.bookstore.queue.direct

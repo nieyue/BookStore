@@ -1,7 +1,12 @@
 package com.nieyue.rabbitmq.confirmcallback;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -22,12 +27,14 @@ import com.nieyue.bean.DataRabbitmqDTO;
 import com.nieyue.bean.FlowWater;
 import com.nieyue.business.AcountBusiness;
 import com.nieyue.business.BookOrderBusiness;
+import com.nieyue.service.BookOrderDetailService;
 import com.nieyue.service.BookOrderService;
 import com.nieyue.service.BookService;
 import com.nieyue.service.DailyDataService;
 import com.nieyue.service.DataService;
 import com.nieyue.util.DateUtil;
 import com.rabbitmq.client.Channel;
+
 
 /**
  * 消息监听者
@@ -44,6 +51,8 @@ public class Listener {
 	private BookService bookService;
 	@Resource
 	private BookOrderService bookOrderService;
+	@Resource
+	private BookOrderDetailService bookOrderDetailService;
 	@Resource
 	private BookOrderBusiness bookOrderBusiness;
 	@Resource
@@ -62,36 +71,99 @@ public class Listener {
 		 * @throws IOException
 		 */
 	    @RabbitListener(queues="${myPugin.rabbitmq.BOOKORDER_DIRECT_QUEUE}") 
-	    public void BookOrder(Channel channel, BookOrder bookOrder,Message message) throws IOException   {
+	    public void bookOrder(Channel channel, BookOrder bookOrder,Message message) throws IOException   {
 	           try {
-	        	  boolean b = bookOrderService.addBookOrder(bookOrder);
+	        	 bookOrderService.addBookOrder(bookOrder);
+	        	   channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+			} catch (Exception e) {
+				 try {
+					channel.basicNack(message.getMessageProperties().getDeliveryTag(), false,false);
+				} catch (IOException e1) {
+					channel.basicNack(message.getMessageProperties().getDeliveryTag(), false,false);
+					
+					e1.printStackTrace();
+				}
+				//e.printStackTrace();
+			} //确认消息成功消费 
+	    }     
+	    
+	    /**
+		 * 书支付
+		 * @param channel
+		 * @param orderRabbitmqDTO
+		 * @param message
+		 * @throws IOException
+		 */
+	    @RabbitListener(queues="${myPugin.rabbitmq.BOOKPAYMENT_DIRECT_QUEUE}") 
+	    public void bookPayment(Channel channel,List< Integer> bookOrderDetailIdList,Message message) throws IOException   {
+	           try {
+	        	   boolean b=false;
+	        	   Set<Integer> bookOrderAcountIdList=new HashSet<Integer>();//acountId集合
+	        	   List<BookOrderDetail> bookOrderDetailList=new ArrayList<BookOrderDetail>();//书订单详情集合
+	        	   //确定
+	        		for (int j = 0; j < bookOrderDetailIdList.size(); j++) {
+		      			BookOrderDetail bookOrderDetail = bookOrderDetailService.loadBookOrderDetail(bookOrderDetailIdList.get(j));
+		      			
+		      			BookOrder bookOrder=bookOrderService.loadBookOrder(bookOrderDetail.getBookOrderId());
+		      			boolean boilb = bookOrderAcountIdList.add(bookOrder.getAcountId());//增加账户ID
+		      			if(boilb){
+		      				bookOrder.setUpdateDate(new Date());
+		      				b = bookOrderService.updateBookOrder(bookOrder);
+		      			}
+		      			//非正常
+		      			if(bookOrderAcountIdList.size()>=2 || bookOrderAcountIdList.size()<=0){
+		      				channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+		      				return ;
+		      			}
+		      			bookOrderDetailList.add(bookOrderDetail);//添加到集合
+	        		}
 	        	  if(b){
     			//记录流水，新手任务收益
     			FlowWater flowWater = new FlowWater();
-    			flowWater.setAcountId(bookOrder.getAcountId());
+    			flowWater.setAcountId(bookOrderAcountIdList.iterator().next());
     			flowWater.setCreateDate(new Date());
     			Double money=0.0;//积分
     			Double realMoney=0.0;//真钱
-    			for (int i = 0; i < bookOrder.getBookOrderDetailList().size(); i++) {
-    				BookOrderDetail bod = bookOrder.getBookOrderDetailList().get(i);
-    				//真钱消费
-    				if(bod.getPayType().equals(1)){
-    				realMoney+=bod.getRealMoney();
+    			Set<Integer> subTypeSet=new HashSet<Integer>(); 
+    			//获取消费额度
+    			for (int i = 0; i < bookOrderDetailList.size(); i++) {
+    				BookOrderDetail bookOrderDetail = bookOrderDetailList.get(i);
+	      			//混合消费
+					if(bookOrderDetail.getPayType().equals(0)){
+						realMoney+=bookOrderDetail.getRealMoney();
+						money+=bookOrderDetail.getMoney();
+						flowWater.setSubtype(0);
+						subTypeSet.add(0);
+	      			//真钱消费
+					}else if(bookOrderDetail.getPayType().equals(1)){
+    				realMoney+=bookOrderDetail.getRealMoney();
 					flowWater.setSubtype(1);
+					subTypeSet.add(1);
     				//积分消费
-    				}else if(bod.getPayType().equals(2)){
-					money+=bod.getMoney();
+    				}else if(bookOrderDetail.getPayType().equals(2)){
+					money+=bookOrderDetail.getMoney();
 					flowWater.setSubtype(2);
-					//混合消费
-    				}else if(bod.getPayType().equals(0)){
-    					realMoney+=bod.getRealMoney();
-    					money+=bod.getMoney();
-    					flowWater.setSubtype(0);
+					subTypeSet.add(2);
     				}
 				}
+    			if(subTypeSet.size()>1){//必定是混合
+    			flowWater.setSubtype(0);
+    			}else{//=1
+    				flowWater.setSubtype(subTypeSet.iterator().next());
+    			}
     			flowWater.setMoney(-money);//商品为减
     			flowWater.setRealMoney(-realMoney);
     			flowWater.setType(-2);//-2书城消费
+    			//调用支付
+    			
+    			
+    			//更新订单的商品
+    			for (int i = 0; i < bookOrderDetailList.size(); i++) {
+    			BookOrderDetail bookOrderDetail = bookOrderDetailList.get(i);
+    			bookOrderDetail.setUpdateDate(new Date());
+      			bookOrderDetail.setStatus(1);//已支付
+      			b=bookOrderDetailService.updateBookOrderDetail(bookOrderDetail);
+    			}
     			sender.sendBookOrderFlowWater(flowWater);
 	        	  } 
 	        	   channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);

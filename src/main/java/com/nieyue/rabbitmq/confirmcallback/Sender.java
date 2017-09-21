@@ -1,5 +1,6 @@
 package com.nieyue.rabbitmq.confirmcallback;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -43,6 +44,15 @@ public class Sender  implements RabbitTemplate.ConfirmCallback{
 	        CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
 	        this.rabbitTemplate.convertAndSend(amqpConfig.BOOKORDER_DIRECT_EXCHANGE, amqpConfig.BOOKORDER_DIRECT_ROUTINGKEY, bookOrder, correlationData);  
 	     
+	 }  
+	 /**
+	  * 书支付
+	  * @param orderRabbitmqDTO
+	  */
+	 public void sendBookPayment(List<Integer> bookOrderDetailIdList) { 
+		 CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
+		 this.rabbitTemplate.convertAndSend(amqpConfig.BOOKPAYMENT_DIRECT_EXCHANGE, amqpConfig.BOOKPAYMENT_DIRECT_ROUTINGKEY, bookOrderDetailIdList, correlationData);  
+		 
 	 }  
 	 /**
 	  * 书订单流水

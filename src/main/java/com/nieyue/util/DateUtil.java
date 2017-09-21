@@ -1,11 +1,21 @@
 package com.nieyue.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
+import com.nieyue.bean.BookOrder;
+import com.nieyue.bean.BookOrderDetail;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
  * 日期格式化类
@@ -302,5 +312,36 @@ public class DateUtil {
         Date d1=new Date("2016/3/2 0:00:00");
         Date d2=new Date("2016/3/1 23:59:59");
         System.out.println(getSeparatedTime(d2,d1));
+        
+        String aa="%7B\"acountId\"%3A1000%2C\"bookOrderDetailList\"%3A%5B%7B\"billingMode\"%3A1%2C\"bookOrderDetailId\"%3A0%2C\"bookOrderId\"%3A0%2C\"createDate\"%3Anull%2C\"money\"%3A0%2C\"payType\"%3A1%2C\"realMoney\"%3A0.01%2C\"status\"%3A0%2C\"updateDate\"%3Anull%7D%5D%2C\"bookOrderId\"%3A0%2C\"createDate\"%3A%7B\"date\"%3A18%2C\"day\"%3A1%2C\"hours\"%3A10%2C\"minutes\"%3A33%2C\"month\"%3A8%2C\"seconds\"%3A58%2C\"time\"%3A1505702038564%2C\"timezoneOffset\"%3A-480%2C\"year\"%3A117%7D%2C\"orderNumber\"%3A\"27012017091810335810013\"%2C\"updateDate\"%3A%7B\"date\"%3A18%2C\"day\"%3A1%2C\"hours\"%3A10%2C\"minutes\"%3A33%2C\"month\"%3A8%2C\"seconds\"%3A58%2C\"time\"%3A1505702038564%2C\"timezoneOffset\"%3A-480%2C\"year\"%3A117%7D%7D";
+        try {
+			aa=URLDecoder.decode(aa, "UTF-8");
+			System.out.println(aa);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        JSONObject json=JSONObject.fromObject(aa);
+        System.out.println(json.get("acountId"));
+		BookOrder bookOrder = (BookOrder) JSONObject.toBean(json, BookOrder.class);
+		System.err.println(bookOrder.toString());
+		
+		String bb="{\"acountId\":1000,\"bookOrderDetailList\":[{\"billingMode\":1,\"bookOrderDetailId\":0,\"bookOrderId\":0,\"createDate\":{\"date\":18,\"day\":1,\"hours\":10,\"minutes\":33,\"month\":8,\"seconds\":58,\"time\":1505702038564,\"timezoneOffset\":-480,\"year\":117},\"money\":0,\"payType\":1,\"realMoney\":0.01,\"status\":0,\"updateDate\":{\"date\":18,\"day\":1,\"hours\":10,\"minutes\":33,\"month\":8,\"seconds\":58,\"time\":1505702038564,\"timezoneOffset\":-480,\"year\":117}}],\"bookOrderId\":0,\"createDate\":{\"date\":18,\"day\":1,\"hours\":10,\"minutes\":33,\"month\":8,\"seconds\":58,\"time\":1505702038564,\"timezoneOffset\":-480,\"year\":117},\"orderNumber\":\"27012017091810335810013\",\"updateDate\":{\"date\":18,\"day\":1,\"hours\":10,\"minutes\":33,\"month\":8,\"seconds\":58,\"time\":1505702038564,\"timezoneOffset\":-480,\"year\":117}}";
+    
+		JSONObject json2=JSONObject.fromObject(bb);
+		BookOrder bookOrder2 = (BookOrder) JSONObject.toBean(json2, BookOrder.class);
+		int bodls = bookOrder2.getBookOrderDetailList().size();
+		List<BookOrderDetail> bodl=new ArrayList<BookOrderDetail>();
+		for (int i = 0; i < bodls; i++) {
+			 Object bodjson = bookOrder2.getBookOrderDetailList().get(i);
+			 JSONObject boddjo = JSONObject.fromObject(bodjson);
+			 BookOrderDetail bookOrderDetail23 = (BookOrderDetail) JSONObject.toBean(boddjo, BookOrderDetail.class);
+			 bodl.add(bookOrderDetail23);
+		}
+		bookOrder2.getBookOrderDetailList().clear();
+		System.err.println(bookOrder2.toString());
+		bookOrder2.getBookOrderDetailList().addAll(bodl);
+		System.err.println(bookOrder2.toString());
+		
     }  
 }

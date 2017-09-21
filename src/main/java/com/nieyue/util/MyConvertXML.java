@@ -13,7 +13,6 @@ import org.dom4j.Element;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nieyue.filter.params.MyNamingStrategy;
-import com.nieyue.weixin.bean.UnifiedOrder;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
@@ -92,12 +91,12 @@ public class MyConvertXML {
 	 * @param o
 	 * @return
 	 */
-	public static Object getObj(String xml,Object o){
+	/*public static Object getObj(String xml,Object o){
 		XStream xs =new XStream();
 		xs.alias("xml", o.getClass());
 		 o = (UnifiedOrder) xs.fromXML(xml);
 		return o;
-	}
+	}*/
 	/**
 	 * xml转对象 下划线转驼峰
 	 * @param o
