@@ -58,5 +58,9 @@ public class BookCate implements Serializable{
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+	@Override
+	public String toString() {
+		return "BookCate [bookCateId=" + bookCateId + ", name=" + name + ", updateDate=" + updateDate + "]";
+	}
 	
 }

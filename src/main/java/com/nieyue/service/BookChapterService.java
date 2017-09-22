@@ -46,4 +46,18 @@ public interface BookChapterService {
 			int pageSize,
 			String orderName,
 			String orderWay) ;
+	/** 分页整体书章节信息 */
+	public List<BookChapter> browsePagingAllBookChapter(
+			Integer cost,
+			Integer startNumber,
+			Integer endNumber,
+			Long wordNumber,
+			Integer bookId,
+			Date createDate,
+			Date updateDate,
+			Integer status,
+			int pageNum,
+			int pageSize,
+			String orderName,
+			String orderWay) ;
 }

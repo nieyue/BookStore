@@ -17,7 +17,7 @@ public interface BookCateService {
 	/** 更新书类型*/	
 	public boolean updateBookCate(BookCate bookCate);
 	/** 装载书类型 */	
-	public BookCate loadBookCate(Integer bookCateId);	
+	public BookCate loadBookCate(Integer bookCateId,String name);	
 	/** 书类型总共数目 */	
 	public int countAll();
 	/** 分页书类型信息 */

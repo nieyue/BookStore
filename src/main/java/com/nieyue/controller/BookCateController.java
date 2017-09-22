@@ -71,6 +71,15 @@ public class BookCateController {
 		return ResultUtil.getSR(am);
 	}
 	/**
+	 *渠道书类型增加
+	 * @return 
+	 */
+	@RequestMapping(value = "/authAdd", method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody StateResult channelAddBookCate(@ModelAttribute BookCate bookCate, HttpSession session) {
+		boolean am = bookCateService.addBookCate(bookCate);
+		return ResultUtil.getSR(am);
+	}
+	/**
 	 * 书类型删除
 	 * @return
 	 */
@@ -95,7 +104,7 @@ public class BookCateController {
 	@RequestMapping(value = "/{bookCateId}", method = {RequestMethod.GET,RequestMethod.POST})
 	public  StateResultList loadBookCate(@PathVariable("bookCateId") Integer bookCateId,HttpSession session)  {
 		List<BookCate> list = new ArrayList<BookCate>();
-		BookCate bookCate = bookCateService.loadBookCate(bookCateId);
+		BookCate bookCate = bookCateService.loadBookCate(bookCateId,null);
 			if(bookCate!=null &&!bookCate.equals("")){
 				list.add(bookCate);
 				return ResultUtil.getSlefSRSuccessList(list);

@@ -2,6 +2,7 @@ package com.nieyue.bean;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 书
@@ -43,7 +44,7 @@ public class Book implements Serializable{
 	 */
 	private Long wordNumber;
 	/**
-	 *推荐，默认0不推，1封推，2精推，3优推
+	 *推荐，默认0不推，1封推，2精推，3优推，5男生最爱，6女生最爱
 	 */
 	private Integer recommend;
 	/**
@@ -71,6 +72,10 @@ public class Book implements Serializable{
 	 */
 	private Integer readingNumber;
 	/**
+	 *跳转url
+	 */
+	private String redirectUrl;
+	/**
 	 *下架0,上架1
 	 */
 	private Integer status;
@@ -90,6 +95,10 @@ public class Book implements Serializable{
 	 * 书类型
 	 */
 	private BookCate bookCate;
+	/**
+	 * 书章节列表
+	 */
+	private List<BookChapter> bookChapterList;
 
 	public Book() {
 		super();
@@ -97,8 +106,8 @@ public class Book implements Serializable{
 
 	public Book(Integer bookId, String title, String summary, String author, String imgAddress, Integer chapterNumber,
 			Long wordNumber, Integer recommend, Integer cost, Integer collectNumber, Integer pvs, Integer uvs,
-			Integer ips, Integer readingNumber, Integer status, Integer bookCateId, Date createDate, Date updateDate,
-			BookCate bookCate) {
+			Integer ips, Integer readingNumber, String redirectUrl, Integer status, Integer bookCateId, Date createDate,
+			Date updateDate, BookCate bookCate, List<BookChapter> bookChapterList) {
 		super();
 		this.bookId = bookId;
 		this.title = title;
@@ -114,12 +123,15 @@ public class Book implements Serializable{
 		this.uvs = uvs;
 		this.ips = ips;
 		this.readingNumber = readingNumber;
+		this.redirectUrl = redirectUrl;
 		this.status = status;
 		this.bookCateId = bookCateId;
 		this.createDate = createDate;
 		this.updateDate = updateDate;
 		this.bookCate = bookCate;
+		this.bookChapterList = bookChapterList;
 	}
+
 
 
 	public Integer getBookId() {
@@ -243,5 +255,30 @@ public class Book implements Serializable{
 	public void setChapterNumber(Integer chapterNumber) {
 		this.chapterNumber = chapterNumber;
 	}
-	
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
+	}
+
+	public List<BookChapter> getBookChapterList() {
+		return bookChapterList;
+	}
+
+	public void setBookChapterList(List<BookChapter> bookChapterList) {
+		this.bookChapterList = bookChapterList;
+	}
+
+	@Override
+	public String toString() {
+		return "Book [bookId=" + bookId + ", title=" + title + ", summary=" + summary + ", author=" + author
+				+ ", imgAddress=" + imgAddress + ", chapterNumber=" + chapterNumber + ", wordNumber=" + wordNumber
+				+ ", recommend=" + recommend + ", cost=" + cost + ", collectNumber=" + collectNumber + ", pvs=" + pvs
+				+ ", uvs=" + uvs + ", ips=" + ips + ", readingNumber=" + readingNumber + ", redirectUrl=" + redirectUrl
+				+ ", status=" + status + ", bookCateId=" + bookCateId + ", createDate=" + createDate + ", updateDate="
+				+ updateDate + ", bookCate=" + bookCate + ", bookChapterList=" + bookChapterList + "]";
+	}
 }

@@ -90,10 +90,11 @@ public class HttpClientUtil {
 		     StringEntity s = new StringEntity(json,"utf-8");
 		   //创建参数列表
 		     post.setEntity(s);
+		     post.setHeader("Content-type", "application/json; charset=utf-8");
 		      CloseableHttpResponse res = client.execute(post);
 		      if(res.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
-		       System.out.println(res.getEntity().getContentType());
-		       System.out.println(res.getEntity().getContentEncoding());
+		       //System.out.println(res.getEntity().getContentType());
+		       //System.out.println(res.getEntity().getContentEncoding());
 		       result = EntityUtils.toString(res.getEntity(),"UTF-8");// 返回json格式：
 		       // Map<String, Object> map = MyDom4jUtil.xmlStrToMap(result);
 		       // response=JSONObject.fromObject(map);
@@ -143,9 +144,9 @@ public class HttpClientUtil {
 		  try {
 			  StringEntity s = new StringEntity(xml,"utf-8");
 			  post.setEntity(s);
-			  System.out.println(s);
+			 // System.out.println(s);
 			  CloseableHttpResponse res = client.execute(post);
-			  System.out.println(res);
+			 // System.out.println(res);
 			  if(res.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
 				  response = EntityUtils.toString(res.getEntity(),"utf-8");// 返回xml格式：
 				  //response = JSONObject.fromObject(result);

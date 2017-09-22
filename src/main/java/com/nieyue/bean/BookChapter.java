@@ -137,5 +137,12 @@ public class BookChapter implements Serializable{
 	public void setCost(Integer cost) {
 		this.cost = cost;
 	}
+
+	@Override
+	public String toString() {
+		return "BookChapter [bookChapterId=" + bookChapterId + ", number=" + number + ", title=" + title
+				+ ", wordNumber=" + wordNumber + ", content=" + content + ", cost=" + cost + ", status=" + status
+				+ ", createDate=" + createDate + ", updateDate=" + updateDate + ", bookId=" + bookId + "]";
+	}
 	
 }

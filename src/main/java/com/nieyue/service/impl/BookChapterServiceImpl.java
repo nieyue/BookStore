@@ -140,6 +140,33 @@ public class BookChapterServiceImpl implements BookChapterService{
 		return l;
 	}
 	@Override
+	public List<BookChapter> browsePagingAllBookChapter(
+			Integer cost,
+			Integer startNumber,
+			Integer endNumber,
+			Long wordNumber,
+			Integer bookId,
+			Date createDate,
+			Date updateDate,
+			Integer status,
+			int pageNum, int pageSize,
+			String orderName, String orderWay) {
+		if(pageNum<1){
+			pageNum=1;
+		}
+		if(pageSize<1){
+			pageSize=0;//没有数据
+		}
+		List<BookChapter> l = bookChapterDao.browsePagingAllBookChapter(
+				cost,
+				startNumber,
+				endNumber,
+				wordNumber,
+				bookId,createDate,updateDate,status,
+				pageNum-1, pageSize, orderName, orderWay);
+		return l;
+	}
+	@Override
 	public BookChapter loadSmallBookChapter(Integer bookChapterId) {
 		BookChapter r = bookChapterDao.loadBookChapter(bookChapterId);
 		return r;

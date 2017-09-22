@@ -110,6 +110,35 @@ public class BookController {
 		return ResultUtil.getSR(am);
 	}
 	/**
+	 * 授权书增加
+	 * @return 
+	 */
+	@RequestMapping(value = "/authAdd", method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody StateResult authAdd(
+			@RequestParam(value="title")String title, 
+			@RequestParam(value="summary")String summary, 
+			@RequestParam(value="author")String author, 
+			@RequestParam(value="imgAddress")String imgAddress, 
+			@RequestParam(value="recommend",required=false)Integer recommend, 
+			@RequestParam(value="cost",required=false)Integer cost, 
+			@RequestParam(value="bookCateId")Integer bookCateId, 
+			HttpSession session) {
+		Book book=new Book();
+		book.setTitle(title);
+		book.setSummary(summary);
+		book.setAuthor(author);
+		book.setImgAddress(imgAddress);
+		if(recommend!=null&&!recommend.equals("")){
+		book.setRecommend(recommend);
+		}
+		if(cost!=null&&!cost.equals("")){
+		book.setCost(cost);
+		}
+		book.setBookCateId(bookCateId);
+		boolean am = bookService.addBook(book);
+		return ResultUtil.getSR(am);
+	}
+	/**
 	 * 书删除
 	 * @return
 	 */

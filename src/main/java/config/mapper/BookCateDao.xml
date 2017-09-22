@@ -34,7 +34,14 @@ SELECT
 	 	name,
     	update_date
 FROM book_cate_tb 
-WHERE book_cate_id=#{bookCateId}
+<where>
+<if test="bookCateId!=null">
+AND book_cate_id=#{bookCateId}
+</if>
+<if test="name!=null">
+AND name=#{name}
+</if>
+</where>
 </select>
 
 <!-- 分页查询书类型-->

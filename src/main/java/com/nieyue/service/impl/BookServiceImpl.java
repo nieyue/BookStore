@@ -13,6 +13,7 @@ import com.nieyue.bean.Book;
 import com.nieyue.bean.BookCate;
 import com.nieyue.dao.BookDao;
 import com.nieyue.service.BookCateService;
+import com.nieyue.service.BookChapterService;
 import com.nieyue.service.BookService;
 @Service
 public class BookServiceImpl implements BookService{
@@ -20,6 +21,8 @@ public class BookServiceImpl implements BookService{
 	BookDao bookDao;
 	@Resource
 	BookCateService bookCateService;
+	@Resource
+	BookChapterService bookChapterService;
 	@Transactional(propagation=Propagation.REQUIRED)
 	@Override
 	public boolean addBook(Book book) {
@@ -61,7 +64,7 @@ public class BookServiceImpl implements BookService{
 	@Override
 	public Book loadBook(Integer bookId) {
 		Book book = bookDao.loadBook(bookId);
-		BookCate bookCate = bookCateService.loadBookCate(book.getBookCateId());
+		BookCate bookCate = bookCateService.loadBookCate(book.getBookCateId(),null);
 		book.setBookCate(bookCate);
 		return book;
 	}
@@ -126,7 +129,7 @@ public class BookServiceImpl implements BookService{
 				pageNum-1, pageSize, orderName, orderWay);
 		
 		for (Book book : l) {
-			BookCate bookCate = bookCateService.loadBookCate(book.getBookCateId());
+			BookCate bookCate = bookCateService.loadBookCate(book.getBookCateId(),null);
 			book.setBookCate(bookCate);
 		}
 		return l;

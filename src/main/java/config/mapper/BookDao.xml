@@ -21,6 +21,7 @@
    		 uvs,
    		 ips,
    		 reading_number,
+   		 redirect_url,
    		 status,
    		 book_cate_id,
    		 create_date,
@@ -40,6 +41,7 @@
     	 #{uvs},
     	 #{ips},
     	 #{readingNumber},
+    	 #{redirectUrl},
     	 #{status},
     	 #{bookCateId},
     	 #{createDate},
@@ -89,6 +91,9 @@
     	<if test="readingNumber!=null">
     	reading_number=#{readingNumber},
     	</if>
+    	<if test="redirectUrl!=null">
+    	redirect_url=#{redirectUrl},
+    	</if>
     	<if test="status!=null">
     	status=#{status},
     	</if>
@@ -128,6 +133,7 @@ SELECT
    		 uvs,
    		 ips,
    		 reading_number,
+    	 redirect_url,
    		 status,
    		 book_cate_id,
    		 create_date,
@@ -152,6 +158,7 @@ SELECT
    		 uvs,
    		 ips,
    		 reading_number,
+   		 redirect_url,
    		 status,
    		 book_cate_id,
    		 create_date,
@@ -177,6 +184,7 @@ WHERE book_id=#{bookId}
    		 uvs,
    		 ips,
    		 reading_number,
+   		 redirect_url,
    		 status,
    		 book_cate_id,
    		 create_date,

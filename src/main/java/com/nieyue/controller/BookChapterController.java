@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nieyue.bean.Acount;
 import com.nieyue.bean.BookChapter;
 import com.nieyue.service.BookChapterService;
 import com.nieyue.util.ResultUtil;
@@ -61,6 +62,34 @@ public class BookChapterController {
 			}
 	}
 	/**
+	 * 整体书章节分页浏览
+	 * @param orderName 书章节排序数据库字段
+	 * @param orderWay 书章节排序方法 asc升序 desc降序
+	 * @return
+	 */
+	@RequestMapping(value = "/listAll", method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody StateResultList browsePagingAllBookChapter(
+			@RequestParam(value="cost",required=false)Integer cost,
+			@RequestParam(value="startNumber",required=false)Integer startNumber,
+			@RequestParam(value="endNumber",required=false)Integer endNumber,
+			@RequestParam(value="wordNumber",required=false)Long wordNumber,
+			@RequestParam(value="bookId",required=false)Integer bookId,
+			@RequestParam(value="createDate",required=false)Date createDate,
+			@RequestParam(value="updateDate",required=false)Date updateDate,
+			@RequestParam(value="status",required=false)Integer status,
+			@RequestParam(value="pageNum",defaultValue="1",required=false)int pageNum,
+			@RequestParam(value="pageSize",defaultValue="10",required=false) int pageSize,
+			@RequestParam(value="orderName",required=false,defaultValue="book_chapter_id") String orderName,
+			@RequestParam(value="orderWay",required=false,defaultValue="desc") String orderWay)  {
+		List<BookChapter> list = new ArrayList<BookChapter>();
+		list= bookChapterService.browsePagingAllBookChapter(cost,startNumber,endNumber,wordNumber,bookId,createDate,updateDate,status,pageNum, pageSize, orderName, orderWay);
+		if(list.size()>0){
+			return ResultUtil.getSlefSRSuccessList(list);
+		}else{
+			return ResultUtil.getSlefSRFailList(list);
+		}
+	}
+	/**
 	 * 书章节修改
 	 * @return
 	 */
@@ -75,6 +104,15 @@ public class BookChapterController {
 	 */
 	@RequestMapping(value = "/add", method = {RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody StateResult addBookChapter(@ModelAttribute BookChapter bookChapter, HttpSession session) {
+		boolean am =bookChapterService.addBookChapter(bookChapter);
+		return ResultUtil.getSR(am);
+	}
+	/**
+	 * 书章节增加
+	 * @return 
+	 */
+	@RequestMapping(value = "/authAdd", method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody StateResult authAddBookChapter(@ModelAttribute BookChapter bookChapter, HttpSession session) {
 		boolean am =bookChapterService.addBookChapter(bookChapter);
 		return ResultUtil.getSR(am);
 	}
@@ -112,7 +150,11 @@ public class BookChapterController {
 	public  StateResultList loadBookChapter(@PathVariable("bookChapterId") Integer bookChapterId,HttpSession session)  {
 		List<BookChapter> list = new ArrayList<BookChapter>();
 		BookChapter bookChapter = bookChapterService.loadBookChapter(bookChapterId);
-			if(bookChapter!=null &&!bookChapter.equals("")){
+		//付费的
+		if((bookChapter.getCost()==1)&&(Acount)session.getAttribute("acount")==null){
+			return ResultUtil.getSlefSRFailList(list);
+		}	
+		if(bookChapter!=null &&!bookChapter.equals("")){
 				list.add(bookChapter);
 				return ResultUtil.getSlefSRSuccessList(list);
 			}else{
@@ -131,6 +173,10 @@ public class BookChapterController {
 			HttpSession session)  {
 		List<BookChapter> list = new ArrayList<BookChapter>();
 		BookChapter bookChapter = bookChapterService.readBookChapter(bookId,number);
+		//付费的
+		if((bookChapter.getCost()==1)&&(Acount)session.getAttribute("acount")==null){
+			return ResultUtil.getSlefSRFailList(list);
+		}
 		if(bookChapter!=null &&!bookChapter.equals("")){
 			list.add(bookChapter);
 			return ResultUtil.getSlefSRSuccessList(list);

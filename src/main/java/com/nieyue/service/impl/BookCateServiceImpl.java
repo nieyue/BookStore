@@ -38,8 +38,8 @@ public class BookCateServiceImpl implements BookCateService{
 	}
 
 	@Override
-	public BookCate loadBookCate(Integer bookCateId) {
-		BookCate r = bookCateDao.loadBookCate(bookCateId);
+	public BookCate loadBookCate(Integer bookCateId,String name) {
+		BookCate r = bookCateDao.loadBookCate(bookCateId,name);
 		return r;
 	}
 

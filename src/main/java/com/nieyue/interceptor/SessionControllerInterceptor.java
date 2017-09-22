@@ -64,6 +64,7 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         
         if(
         		request.getServletPath().equals("/")
+        		||((request.getRequestURI().indexOf("auth")>-1)&& MyDESutil.getMD5("auth1000").equals(request.getParameter("authid")))//临时授权
         		||request.getRequestURI().indexOf("tool")>-1
         		||request.getRequestURI().indexOf("swagger")>-1 
         		||request.getRequestURI().indexOf("api-docs")>-1
@@ -84,6 +85,7 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         		//bookChapter
         		||request.getRequestURI().indexOf("bookChapter/count")>-1
         		||request.getRequestURI().indexOf("bookChapter/list")>-1
+        		||request.getRequestURI().indexOf("bookChapter/read")>-1
         		||method.getName().equals("loadBookChapter")
         		//bookOrder
         		||request.getRequestURI().indexOf("bookOrder/count")>-1

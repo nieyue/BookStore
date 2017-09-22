@@ -67,6 +67,10 @@ public class MyDESutil {
 		System.out.println(DateUtil.dateFormatSimpleDate(new Date(newtime), "yyyy-MM-dd HH:mm:ss"));
 		String md5timestamp=getMD5Timestamp("123456",newtime);
 		System.out.println(md5timestamp);
+		String mddd=getMD5("auth1000");
+		String mddd2=getMD5(1000);
+				System.out.println(mddd);
+				System.out.println(mddd2);
 		
 		 
 	}
