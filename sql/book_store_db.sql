@@ -47,6 +47,23 @@ INDEX INDEX_UPDATEDATE (update_date) USING BTREE,
 INDEX INDEX_STATUS (status) USING BTREE
 )ENGINE = InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='书表';
 
+#创建书会员表 
+CREATE TABLE book_member_tb(
+book_member_id int(11) NOT NULL AUTO_INCREMENT COMMENT '书会员id',
+level tinyint(4) DEFAULT 0 COMMENT '会员等级',
+status tinyint(4) DEFAULT 0 COMMENT '默认0到期，1没到期',
+expire_date datetime COMMENT '到期时间',
+create_date datetime COMMENT '创建时间',
+update_date datetime COMMENT '更新时间',
+acount_id int(11) COMMENT '书会员人id外键',
+PRIMARY KEY (book_member_id),
+INDEX INDEX_ACOUNTID (acount_id) USING BTREE,
+INDEX INDEX_EXPIREDATE (expire_date) USING BTREE,
+INDEX INDEX_CREATEDATE (create_date) USING BTREE,
+INDEX INDEX_UPDATEDATE (update_date) USING BTREE,
+INDEX INDEX_STATUS (status) USING BTREE
+)ENGINE = InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='书会员表';
+
 #创建书收藏表 
 CREATE TABLE book_collect_tb(
 collect_id int(11) NOT NULL AUTO_INCREMENT COMMENT '书收藏id',
@@ -98,17 +115,22 @@ CREATE TABLE book_order_detail_tb(
 book_order_detail_id int(11) NOT NULL AUTO_INCREMENT COMMENT '书订单详情id',
 billing_mode tinyint(4) DEFAULT 1 COMMENT '计费方式，0免费，1包月，2包年，默认为1',
 pay_type tinyint(4) DEFAULT 1 COMMENT '支付类型，0全部，1真钱，2积分，默认为1',
+type tinyint(4) DEFAULT 1 COMMENT '支付商家，1支付宝支付,2微信支付,3银联支付',
 money decimal(11,2) DEFAULT 0 COMMENT '积分价格',
 real_money decimal(11,2) DEFAULT 0  COMMENT '真钱价格',
+start_date datetime COMMENT '开始时间',
+end_date datetime COMMENT '结束时间',
 create_date datetime  COMMENT '创建时间',
 update_date datetime  COMMENT '更新时间',
 status tinyint(4) COMMENT '状态，0已下单，1已支付，2申请退款，3已退款，4拒绝退款,5已完成',
 book_order_id int(11) COMMENT '书订单ID',
 PRIMARY KEY (book_order_detail_id),
 INDEX INDEX_BOOKORDERID (book_order_id) USING BTREE,
-INDEX INDEX_STATUS (status) USING BTREE,
+INDEX INDEX_STARTDATE (start_date) USING BTREE,
+INDEX INDEX_ENDDATE (end_date) USING BTREE,
 INDEX INDEX_CREATEDATE (create_date) USING BTREE,
-INDEX INDEX_UPDATEDATE (update_date) USING BTREE
+INDEX INDEX_UPDATEDATE (update_date) USING BTREE,
+INDEX INDEX_STATUS (status) USING BTREE
 )ENGINE = InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='书订单详情表';
 
 #创建每日数据表 

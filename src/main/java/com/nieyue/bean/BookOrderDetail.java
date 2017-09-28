@@ -19,13 +19,17 @@ public class BookOrderDetail implements Serializable{
 	 */
 	private Integer bookOrderDetailId;
 	/**
-	 * 计费方式，1包月，2包年，默认为1
+	 * 计费方式，0.免费VIP,1包月，2包年，默认为1
 	 */
 	private Integer billingMode;
 	/**
-	 * 支付类型，1真钱，2积分，默认为1
+	 * 支付类型，0全部 ,1真钱，2积分，默认为1
 	 */
 	private Integer payType;
+	/**
+	 * 支付商家，1支付宝支付,2微信支付,3银联支付
+	 */
+	private Integer type;
 	/**
 	 * 积分价格
 	 */
@@ -34,6 +38,14 @@ public class BookOrderDetail implements Serializable{
 	 * 真钱价格
 	 */
 	private Double realMoney;
+	/**
+	 * 开始时间
+	 */
+	private Date startDate;
+	/**
+	 * 结束时间
+	 */
+	private Date endDate;
 	/**
 	 * 创建时间
 	 */
@@ -54,19 +66,25 @@ public class BookOrderDetail implements Serializable{
 	public BookOrderDetail() {
 		super();
 	}
-	public BookOrderDetail(Integer bookOrderDetailId, Integer billingMode, Integer payType, Double money,
-			Double realMoney, Date createDate, Date updateDate, Integer status, Integer bookOrderId) {
+	
+	public BookOrderDetail(Integer bookOrderDetailId, Integer billingMode, Integer payType, Integer type, Double money,
+			Double realMoney, Date startDate, Date endDate, Date createDate, Date updateDate, Integer status,
+			Integer bookOrderId) {
 		super();
 		this.bookOrderDetailId = bookOrderDetailId;
 		this.billingMode = billingMode;
 		this.payType = payType;
+		this.type = type;
 		this.money = money;
 		this.realMoney = realMoney;
+		this.startDate = startDate;
+		this.endDate = endDate;
 		this.createDate = createDate;
 		this.updateDate = updateDate;
 		this.status = status;
 		this.bookOrderId = bookOrderId;
 	}
+
 	public Integer getBookOrderDetailId() {
 		return bookOrderDetailId;
 	}
@@ -97,6 +115,18 @@ public class BookOrderDetail implements Serializable{
 	public void setRealMoney(Double realMoney) {
 		this.realMoney = realMoney;
 	}
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public Date getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -124,11 +154,12 @@ public class BookOrderDetail implements Serializable{
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	@Override
-	public String toString() {
-		return "BookOrderDetail [bookOrderDetailId=" + bookOrderDetailId + ", billingMode=" + billingMode + ", payType="
-				+ payType + ", money=" + money + ", realMoney=" + realMoney + ", createDate=" + createDate
-				+ ", updateDate=" + updateDate + ", status=" + status + ", bookOrderId=" + bookOrderId + "]";
+	public Integer getType() {
+		return type;
 	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
+	
 	
 }

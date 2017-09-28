@@ -3,15 +3,18 @@
 		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="com.nieyue.dao.BookOrderDetailDao">
-<!-- 添加订单商品 -->
+<!-- 添加书订单详情 -->
 <insert id="addBookOrderDetail" parameterType="BookOrderDetail" keyProperty="bookOrderDetailId" flushCache="true"  >  
    INSERT IGNORE INTO
    		  book_order_detail_tb 
    		 (
    		 billing_mode,
    		 pay_type,
+   		 type,
    		 money,
    		 real_money,
+   		 start_date,
+   		 end_date,
    		 create_date,
    		 update_date,
    		 status,
@@ -20,15 +23,18 @@
     	 (
     	 #{billingMode},
     	 #{payType},
+    	 #{type},
     	 #{money},
     	 #{realMoney},
+    	 #{startDate},
+    	 #{endDate},
     	 #{createDate},
     	 #{updateDate},
     	 #{status},
     	 #{bookOrderId}
     	 )  
 </insert>  
-<!-- 更新订单商品 -->
+<!-- 更新书订单详情 -->
 <update id="updateBookOrderDetail" parameterType="BookOrderDetail" >  
     UPDATE 
     	book_order_detail_tb 
@@ -39,11 +45,20 @@
 	<if test="payType!=null">
     	pay_type=#{payType},
     	</if>
+	<if test="type!=null">
+    	type=#{type},
+    	</if>
 	<if test="money!=null">
     	money=#{money},
     	</if>
 	<if test="realMoney!=null">
     	real_money=#{realMoney},
+    	</if>
+	<if test="startDate!=null">
+    	start_date=#{startDate},
+    	</if>
+	<if test="endDate!=null">
+    	end_date=#{endDate},
     	</if>
 	<if test="createDate!=null">
     	create_date=#{createDate},
@@ -61,20 +76,23 @@
     WHERE
     	 book_order_detail_id=#{bookOrderDetailId} 
 </update> 
-<!-- 删除订单商品-->
+<!-- 删除书订单详情-->
 <delete id="delBookOrderDetail"  parameterType="Integer" >  
     DELETE FROM
     	 book_order_detail_tb 
     	 WHERE book_order_detail_id=#{bookOrderDetailId}
 </delete>  
-<!-- 加载订单商品-->
+<!-- 加载书订单详情-->
 <select id="loadBookOrderDetail" parameterType="Integer" resultType="BookOrderDetail" >
 SELECT 
 		 book_order_detail_id,
 	 	 billing_mode,
    		 pay_type,
+   		 type,
    		 money,
    		 real_money,
+   		 start_date,
+   		 end_date,
    		 create_date,
    		 update_date,
    		 status,
@@ -83,14 +101,17 @@ FROM book_order_detail_tb
 WHERE book_order_detail_id=#{BookOrderDetailId}
 </select>
 
-<!-- 分页查询订单商品-->
+<!-- 分页查询书订单详情-->
 <select id="browsePagingBookOrderDetail" resultType="BookOrderDetail">  
         SELECT
 	     book_order_detail_id,
 	 	 billing_mode,
    		 pay_type,
+   		 type,
    		 money,
    		 real_money,
+   		 start_date,
+   		 end_date,
    		 create_date,
    		 update_date,
    		 status,
@@ -100,15 +121,21 @@ WHERE book_order_detail_id=#{BookOrderDetailId}
 	<if test="bookOrderId!=null">
 	AND book_order_id=#{bookOrderId}
 	</if>
-	<if test="status!=null">
-    	status=#{status},
-    </if>
+    <if test="startDate!=null">
+    AND DATE(start_date)=DATE(#{startDate})
+    	</if>
+	<if test="endDate!=null">
+    AND DATE(end_date)=DATE(#{endDate})
+    	</if>
 	<if test="createDate!=null">
 	AND DATE(create_date)=DATE(#{createDate})
 	</if>
 	<if test="updateDate!=null">
 	AND DATE(update_date)=DATE(#{updateDate})
 	</if>
+	<if test="status!=null">
+    AND	status=#{status}
+    </if>
 	AND ${orderName} 
 	<if test="orderWay=='asc'">
 	<![CDATA[>=]]> 
@@ -121,15 +148,21 @@ WHERE book_order_detail_id=#{BookOrderDetailId}
 	<if test="bookOrderId!=null">
 	AND book_order_id=#{bookOrderId}
 	</if>
-	<if test="status!=null">
-    	status=#{status},
-    </if>
+	  <if test="startDate!=null">
+    AND DATE(start_date)=DATE(#{startDate})
+    	</if>
+	<if test="endDate!=null">
+    AND DATE(end_date)=DATE(#{endDate})
+    	</if>
 	<if test="createDate!=null">
 	AND DATE(create_date)=DATE(#{createDate})
 	</if>
 	<if test="updateDate!=null">
 	AND DATE(update_date)=DATE(#{updateDate})
 	</if>
+	<if test="status!=null">
+    AND	status=#{status}
+    </if>
 	</where>
 		ORDER BY 
 			${orderName}  ${orderWay}
@@ -151,15 +184,21 @@ WHERE book_order_detail_id=#{BookOrderDetailId}
 	<if test="bookOrderId!=null">
 	AND book_order_id=#{bookOrderId}
 	</if>
-	<if test="status!=null">
-    	status=#{status},
-    </if>
+	  <if test="startDate!=null">
+    AND DATE(start_date)=DATE(#{startDate})
+    	</if>
+	<if test="endDate!=null">
+    AND DATE(end_date)=DATE(#{endDate})
+    	</if>
 	<if test="createDate!=null">
 	AND DATE(create_date)=DATE(#{createDate})
 	</if>
 	<if test="updateDate!=null">
 	AND DATE(update_date)=DATE(#{updateDate})
 	</if>
+	<if test="status!=null">
+    AND	status=#{status}
+    </if>
 	</where>
 </select>   
    

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nieyue.bean.BookMember;
 import com.nieyue.bean.BookOrder;
 import com.nieyue.bean.BookOrderDetail;
 import com.nieyue.bean.Finance;
@@ -28,9 +29,11 @@ import com.nieyue.business.FinanceBusiness;
 import com.nieyue.business.PaymentBusiness;
 import com.nieyue.dao.BookOrderDao;
 import com.nieyue.rabbitmq.confirmcallback.Sender;
+import com.nieyue.service.BookMemberService;
 import com.nieyue.service.BookOrderDetailService;
 import com.nieyue.service.BookOrderService;
 import com.nieyue.util.DateUtil;
+import com.nieyue.util.MyDESutil;
 
 import net.sf.json.JSONObject;
 @Service
@@ -49,37 +52,36 @@ public class BookOrderServiceImpl implements BookOrderService{
 	Sender sender;
 	@Resource
 	PaymentBusiness paymentBusiness;
+	@Resource
+	BookMemberService bookMemberService;
 	@Value("${myPugin.bookStoreDomainUrl}")
 	String bookStoreDomainUrl;
 	@Value("${myPugin.paymentSystemDomainUrl}")
 	String paymentSystemDomainUrl;
 	
 	/**
-	 * {acountId:1000,bookOrderDetailList:[{billingMode:1,payType:1}]}
+	 * {acountId:1000,bookOrderDetailList:[{billingMode:1,payType:1,type:1}]}
 	 */
 	@Transactional(propagation=Propagation.REQUIRED)
 	@Override
 	public boolean addBookOrder(BookOrder bookOrder) {
 		boolean b=false;
 		Double bookOrderMoney=0.0;
+		Date maxEndDate=new Date();
 		//判断库存和金钱
 		List<BookOrderDetail> bookOrderDetailList = bookOrder.getBookOrderDetailList();
 		//判断购买人的财务是否够
 		try {
 			Finance finance = financeBusiness.getFinanceByAcountId(bookOrder.getAcountId());
-			System.err.println(finance.getMoney());
-			System.err.println(bookOrderDetailList.size());
 			for (int i = 0; i < bookOrderDetailList.size(); i++) {
 				BookOrderDetail bod = bookOrderDetailList.get(i);
-				Map<String, Object> map = bookOrderBusiness.getBooOrderMoney(bod.getBillingMode(), bod.getPayType(), bod.getMoney(), bod.getRealMoney());
+				Map<String, Object> map = bookOrderBusiness.getBooOrderMoney(bod.getStartDate(),bod.getBillingMode(), bod.getPayType(), bod.getMoney(), bod.getRealMoney());
 				bookOrderMoney += (Double) map.get("money");
-				
 			}
 			if(finance.getMoney()-bookOrderMoney<0.0){
 				return b;//不够
 			}
 		} catch (Exception e) {
-			System.err.println(e);
 			return b;
 		}//获取
 		//增加商品订单
@@ -87,15 +89,31 @@ public class BookOrderServiceImpl implements BookOrderService{
 		//增加订单的商品
 		for (int i = 0; i < bookOrderDetailList.size(); i++) {
 			BookOrderDetail bookOrderDetail = bookOrderDetailList.get(i);
-			Map<String, Object> bobmap = bookOrderBusiness.getBooOrderMoney(bookOrderDetail.getBillingMode(), bookOrderDetail.getPayType(), bookOrderDetail.getMoney(), bookOrderDetail.getRealMoney());
-			bookOrderDetail.setCreateDate(new Date());
-			bookOrderDetail.setUpdateDate(new Date());
 			bookOrderDetail.setBookOrderId(bookOrder.getBookOrderId());
 			bookOrderDetail.setStatus(1);//已支付
-			bookOrderDetail.setRealMoney((Double) bobmap.get("realMoney"));
-			bookOrderDetail.setMoney((Double) bobmap.get("money"));
 			b=bookOrderDetailService.addBookOrderDetail(bookOrderDetail);
+			if(bookOrderDetail.getEndDate().after(maxEndDate)){//设置最大的过期时间
+				maxEndDate=bookOrderDetail.getEndDate();
+			}
 		}
+		//增加或修改会员记录
+		List<BookMember> bml = bookMemberService.browsePagingBookMember(bookOrder.getAcountId(), null, null, null, null, 1, 1, "book_member_id", "asc");	
+		BookMember bookMember;
+		if(bml.size()==0){
+			bookMember=new BookMember();
+			bookMember.setAcountId(bookOrder.getAcountId());
+			bookMember.setExpireDate(maxEndDate);
+			bookMember.setStatus(1);
+			bookMemberService.addBookMember(bookMember);
+		}else{
+			bookMember=bml.get(0);
+			bookMember.setExpireDate(maxEndDate);
+			bookMember.setStatus(1);
+			bookMemberService.updateBookMember(bookMember);
+		}
+		
+		
+		
 		//记录流水，新手任务收益
 				FlowWater flowWater = new FlowWater();
 				flowWater.setAcountId(bookOrder.getAcountId());
@@ -137,27 +155,43 @@ public class BookOrderServiceImpl implements BookOrderService{
 	}
 	/**
 	 * 同步
-	 * {acountId:1000,bookOrderDetailList:[{billingMode:1,payType:1}]}
+	 * {acountId:1000,bookOrderDetailList:[{billingMode:1,payType:1,type:1}]}
 	 */
 	@Transactional(propagation=Propagation.REQUIRED)
 	public String addBookOrderSynchronization(BookOrder bookOrder)  {
 		String result="";
 		Double bookOrderMoney=0.0;
 		Double bookOrderRealMoney=0.0;
+		Date bookOrderDetailStartDate;//开始时间
 		//判断库存和金钱
 		List<BookOrderDetail> bookOrderDetailList = bookOrder.getBookOrderDetailList();
 		//判断购买人的财务是否够
 		try {
 			Finance finance = financeBusiness.getFinanceByAcountId(bookOrder.getAcountId());
+			List<BookMember> bml = bookMemberService.browsePagingBookMember(bookOrder.getAcountId(), null, null, null, 1, 1, 1, "book_member_id", "asc");
+			if(bml.size()==0){
+				bookOrderDetailStartDate=new Date();
+			}else{
+				bookOrderDetailStartDate=bml.get(0).getExpireDate();
+			}
+			
 			for (int i = 0; i < bookOrderDetailList.size(); i++) {
 				BookOrderDetail bod = bookOrderDetailList.get(i);
 				bod.setCreateDate(new Date());
 				bod.setUpdateDate(new Date());
-				Map<String, Object> map = bookOrderBusiness.getBooOrderMoney(bod.getBillingMode(), bod.getPayType(), bod.getMoney(), bod.getRealMoney());
-				bookOrderMoney += (Double) map.get("money");
-				bookOrderRealMoney += (Double) map.get("realMoney");
+				Map<String, Object> map = null;
+				if(i==0){//第一个
+					map = bookOrderBusiness.getBooOrderMoney(bookOrderDetailStartDate,bod.getBillingMode(), bod.getPayType(), bod.getMoney(), bod.getRealMoney());
+					bod.setStartDate(bookOrderDetailStartDate);
+				}else{
+					map = bookOrderBusiness.getBooOrderMoney(bookOrderDetailList.get(i-1).getEndDate(),bod.getBillingMode(), bod.getPayType(), bod.getMoney(), bod.getRealMoney());
+					bod.setStartDate(bookOrderDetailList.get(i-1).getEndDate());
+				}
+				bod.setEndDate((Date)map.get("endDate"));
 				bod.setMoney((Double) map.get("money"));
 				bod.setRealMoney((Double) map.get("realMoney"));
+				bookOrderMoney += (Double) map.get("money");
+				bookOrderRealMoney += (Double) map.get("realMoney");
 				
 			}
 			if(finance.getMoney()-bookOrderMoney<0.0){
@@ -221,7 +255,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 		payment.setMoney(realMoney);
 		payment.setOrderNumber(bookOrder.getOrderNumber());
 		payment.setStatus(1);//已下单
-		payment.setType(1);//1支付宝支付
+		payment.setType(bookOrderDetailList.get(0).getType());//支付
 		payment.setBusinessType(1);//书城支付
 		payment.setNotifyUrl(paymentSystemDomainUrl+"/payment/alipayNotifyUrl");
 		//payment.setNotifyUrl(paymentSystemDomainUrl+"/payment/alipayNotifyUrl?auth="+MyDESutil.getMD5("1000"));
@@ -246,7 +280,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 		//payment.setBusinessNotifyUrl(nBookOrderJSON.toString());
 		//payment.setBusinessNotifyUrl(bookStoreDomainUrl+"/bookOrder/paymentNotifyUrl\\?auth="+MyDESutil.getMD5("1000")+"\\&params="+nBookOrderJSON.toString());
 		//System.err.println(payment.getBusinessNotifyUrl());
-		payment.setBusinessNotifyUrl(JSONObject.fromObject(bookOrder).toString());
+		payment.setBusinessNotifyUrl(bookStoreDomainUrl+"/bookOrder/paymentNotifyUrl?auth="+MyDESutil.getMD5("1000")+"&params="+JSONObject.fromObject(bookOrder).toString());
 		//payment.setBusinessNotifyUrl("");
 		//System.err.println(JSONObject.fromObject(bookOrder).toString());
 		try {
@@ -267,7 +301,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 	@Override
 	public boolean delBookOrder(Integer bookOrderId) {
 		boolean b = bookOrderDao.delBookOrder(bookOrderId);
-		List<BookOrderDetail> bookOrderDetailList = bookOrderDetailService.browsePagingBookOrderDetail(bookOrderId,null, null, null, 1, Integer.MAX_VALUE, "book_order_detail_id", "desc");
+		List<BookOrderDetail> bookOrderDetailList = bookOrderDetailService.browsePagingBookOrderDetail(bookOrderId,null,null,null, null, null, 1, Integer.MAX_VALUE, "book_order_detail_id", "desc");
 		for (int i = 0; i < bookOrderDetailList.size(); i++) {
 			BookOrderDetail bookOrderDetail = bookOrderDetailList.get(i);
 			b=bookOrderDetailService.delBookOrderDetail(bookOrderDetail.getBookOrderDetailId());
@@ -285,7 +319,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 	@Override
 	public BookOrder loadBookOrder(Integer bookOrderId) {
 		BookOrder bookOrder = bookOrderDao.loadBookOrder(bookOrderId);
-		List<BookOrderDetail> bookOrderDetailList = bookOrderDetailService.browsePagingBookOrderDetail(bookOrder.getBookOrderId(),null, null, null, 1, Integer.MAX_VALUE, "book_order_detail_id", "desc");
+		List<BookOrderDetail> bookOrderDetailList = bookOrderDetailService.browsePagingBookOrderDetail(bookOrder.getBookOrderId(),null,null,null, null, null, 1, Integer.MAX_VALUE, "book_order_detail_id", "desc");
 		bookOrder.setBookOrderDetailList(bookOrderDetailList);
 		return bookOrder;
 	}
@@ -323,7 +357,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 		
 		for (int i = 0; i < l.size(); i++) {
 			BookOrder bookOrder = l.get(i);
-			List<BookOrderDetail> bookOrderDetailList = bookOrderDetailService.browsePagingBookOrderDetail(bookOrder.getBookOrderId(),null, null, null, 1, Integer.MAX_VALUE, "book_order_detail_id", "desc");
+			List<BookOrderDetail> bookOrderDetailList = bookOrderDetailService.browsePagingBookOrderDetail(bookOrder.getBookOrderId(),null,null,null, null, null, 1, Integer.MAX_VALUE, "book_order_detail_id", "desc");
 			bookOrder.setBookOrderDetailList(bookOrderDetailList);
 		}
 		return l;

@@ -42,15 +42,17 @@ public class BookOrderDetailController {
 	@RequestMapping(value = "/list", method = {RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody StateResultList browsePagingBookOrderDetail(
 			@RequestParam(value="bookOrderId",required=false)Integer bookOrderId,
-			@RequestParam(value="status",required=false)Integer status,
+			@RequestParam(value="startDate",required=false)Date startDate,
+			@RequestParam(value="endDate",required=false)Date endDate,
 			@RequestParam(value="createDate",required=false)Date createDate,
 			@RequestParam(value="updateDate",required=false)Date updateDate,
+			@RequestParam(value="status",required=false)Integer status,
 			@RequestParam(value="pageNum",defaultValue="1",required=false)int pageNum,
 			@RequestParam(value="pageSize",defaultValue="10",required=false) int pageSize,
 			@RequestParam(value="orderName",required=false,defaultValue="book_order_detail_id") String orderName,
 			@RequestParam(value="orderWay",required=false,defaultValue="desc") String orderWay)  {
 			List<BookOrderDetail> list = new ArrayList<BookOrderDetail>();
-			list= bookOrderDetailService.browsePagingBookOrderDetail(bookOrderId,status,createDate,updateDate,pageNum, pageSize, orderName, orderWay);
+			list= bookOrderDetailService.browsePagingBookOrderDetail(bookOrderId,startDate,endDate,createDate,updateDate,status,pageNum, pageSize, orderName, orderWay);
 			if(list.size()>0){
 				return ResultUtil.getSlefSRSuccessList(list);
 			}else{
@@ -91,11 +93,13 @@ public class BookOrderDetailController {
 	@RequestMapping(value = "/count", method = {RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody int countAll(
 			@RequestParam(value="bookOrderId",required=false)Integer bookOrderId,
-			@RequestParam(value="status",required=false)Integer status,
+			@RequestParam(value="startDate",required=false)Date startDate,
+			@RequestParam(value="endDate",required=false)Date endDate,
 			@RequestParam(value="createDate",required=false)Date createDate,
 			@RequestParam(value="updateDate",required=false)Date updateDate,
+			@RequestParam(value="status",required=false)Integer status,
 			HttpSession session)  {
-		int count = bookOrderDetailService.countAll(bookOrderId,status,createDate,updateDate);
+		int count = bookOrderDetailService.countAll(bookOrderId,startDate,endDate,createDate,updateDate,status);
 		return count;
 	}
 	/**

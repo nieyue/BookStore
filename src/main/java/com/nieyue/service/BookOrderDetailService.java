@@ -22,15 +22,20 @@ public interface BookOrderDetailService {
 	/** 书订单详情总共数目 */	
 	public int countAll(
 			Integer bookOrderId,
-			Integer status,
+			Date startDate,
+			Date endDate,
 			Date createDate,
-			Date updateDate);
+			Date updateDate,
+			Integer status
+			);
 	/** 分页书订单详情信息 */
 	public List<BookOrderDetail> browsePagingBookOrderDetail(
 			Integer bookOrderId,
-			Integer status,
+			Date startDate,
+			Date endDate,
 			Date createDate,
 			Date updateDate,
+			Integer status,
 			int pageNum,
 			int pageSize,
 			String orderName,

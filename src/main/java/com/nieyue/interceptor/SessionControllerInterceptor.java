@@ -91,6 +91,8 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         		||request.getRequestURI().indexOf("bookOrder/count")>-1
         		||request.getRequestURI().indexOf("bookOrder/list")>-1
         		||method.getName().equals("loadBookOrder")
+        		//bookMember
+        		||request.getRequestURI().indexOf("bookMember/count")>-1
         		//bookOrderDetail
         		||method.getName().equals("loadBookOrderDetail")
         		//dailyData
@@ -170,6 +172,22 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         					(request.getRequestURI().indexOf("/bookOrder/add")>-1
         					||request.getRequestURI().indexOf("/bookOrder/payment")>-1
         					)
+        					&& request.getParameter("acountId").equals(sessionAcount.getAcountId().toString())){
+        				return true;
+        			}
+        			throw new MySessionException();
+        		}
+        		//书会员不许删除/增加/修改
+        		if( request.getRequestURI().indexOf("/bookMember/delete")>-1 
+        				|| request.getRequestURI().indexOf("/bookMember/add")>-1
+        				|| request.getRequestURI().indexOf("/bookMember/list")>-1
+        				|| request.getRequestURI().indexOf("/bookMember/update")>-1
+        				||method.getName().equals("loadBookMember")
+        				){
+        			//查自身
+        			if( (request.getRequestURI().indexOf("/bookMember/list")>-1
+        					||method.getName().equals("loadBookMember")
+        							)
         					&& request.getParameter("acountId").equals(sessionAcount.getAcountId().toString())){
         				return true;
         			}

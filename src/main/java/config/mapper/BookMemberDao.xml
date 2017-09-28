@@ -2,31 +2,41 @@
 <!DOCTYPE mapper
 		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
-<mapper namespace="com.nieyue.dao.BookOrderDao">
-<!-- 添加书订单 -->
-<insert id="addBookOrder" parameterType="BookOrder" keyProperty="bookOrderId" flushCache="true"  >  
+<mapper namespace="com.nieyue.dao.BookMemberDao">
+<!-- 添加书会员 -->
+<insert id="addBookMember" parameterType="BookMember" keyProperty="bookMemberId" flushCache="true"  >  
    INSERT IGNORE INTO
-   		  book_order_tb 
+   		  book_member_tb 
    		 (
-   		 order_number,
+   		 level,
+   		 status,
+   		 expire_date,
    		 create_date,
    		 update_date,
    		 acount_id)
    VALUES
     	 (
-    	 #{orderNumber},
+    	 #{level},
+    	 #{status},
+    	 #{expireDate},
     	 #{createDate},
     	 #{updateDate},
     	 #{acountId}
     	 )  
 </insert>  
-<!-- 更新书订单 -->
-<update id="updateBookOrder" parameterType="BookOrder" >  
+<!-- 更新书会员 -->
+<update id="updateBookMember" parameterType="BookMember" >  
     UPDATE 
-    	book_order_tb 
+    	book_member_tb 
     <set>
-    <if test="orderNumber!=null">
-    	order_number=#{orderNumber},
+    <if test="level!=null">
+    	level=#{level},
+    </if>
+    <if test="status!=null">
+    	status=#{status},
+    </if>
+    <if test="expireDate!=null">
+    	expire_date=#{expireDate},
     </if>
     <if test="createDate!=null">
     	create_date=#{createDate},
@@ -39,44 +49,54 @@
     </if>
     </set>
     WHERE
-    	book_order_id=#{bookOrderId} 
+    	book_member_id=#{bookMemberId} 
 </update> 
-<!-- 删除书订单-->
-<delete id="delBookOrder"  parameterType="Integer" >  
+<!-- 删除书会员-->
+<delete id="delBookMember"  parameterType="Integer" >  
     DELETE FROM
-    	 book_order_tb 
-    	 WHERE book_order_id=#{bookOrderId}
+    	 book_member_tb 
+    	 WHERE book_member_id=#{bookMemberId}
 </delete>  
-<!-- 加载书订单-->
-<select id="loadBookOrder" parameterType="Integer" resultType="BookOrder" >
+<!-- 加载书会员-->
+<select id="loadBookMember" parameterType="Integer" resultType="BookMember" >
 SELECT 
-		 book_order_id,
-	 	 order_number,
+		 book_member_id,
+	 	 level,
+	 	 status,
+	 	 expire_date,
    		 create_date,
    		 update_date,
    		 acount_id
-FROM book_order_tb 
-WHERE book_order_id=#{bookOrderId}
+FROM book_member_tb 
+WHERE book_member_id=#{bookMemberId}
 </select>
 
-<!-- 分页查询书订单-->
-<select id="browsePagingBookOrder" resultType="BookOrder">  
+<!-- 分页查询书会员-->
+<select id="browsePagingBookMember" resultType="BookMember">  
         SELECT
-	     book_order_id,
-	 	 order_number,
+	     book_member_id,
+	 	 level,
+	 	 status,
+	 	 expire_date,
    		 create_date,
    		 update_date,
    		 acount_id
-	FROM book_order_tb
+	FROM book_member_tb
 	<where>
 	<if test="acountId!=null">
 	AND acount_id=#{acountId}
+	</if>
+	<if test="expireDate!=null">
+	AND expire_date=#{expireDate}
 	</if>
 	<if test="createDate!=null">
 	AND DATE(create_date)=DATE(#{createDate})
 	</if>
 	<if test="updateDate!=null">
 	AND DATE(update_date)=DATE(#{updateDate})
+	</if>
+	<if test="status!=null">
+	AND status=#{status}
 	</if>
 	AND ${orderName} 
 	<if test="orderWay=='asc'">
@@ -85,10 +105,13 @@ WHERE book_order_id=#{bookOrderId}
 	<if test="orderWay=='desc'">
 	  <![CDATA[<= ]]>
 	</if>
-	(SELECT ${orderName} FROM book_order_tb 
+	(SELECT ${orderName} FROM book_member_tb 
 	<where>
 	<if test="acountId!=null">
 	AND acount_id=#{acountId}
+	</if>
+	<if test="expireDate!=null">
+	AND expire_date=#{expireDate}
 	</if>
 	<if test="createDate!=null">
 	AND DATE(create_date)=DATE(#{createDate})
@@ -96,13 +119,16 @@ WHERE book_order_id=#{bookOrderId}
 	<if test="updateDate!=null">
 	AND DATE(update_date)=DATE(#{updateDate})
 	</if>
+	<if test="status!=null">
+	AND status=#{status}
+	</if>
 	</where>
-		ORDER BY 
+		order BY 
 			${orderName}  ${orderWay}
 		LIMIT #{pageNum}, 1
 		) 
 	</where>
-	ORDER BY
+	order BY
 		${orderName}  ${orderWay}
 	LIMIT
 		#{pageSize}
@@ -111,17 +137,23 @@ WHERE book_order_id=#{bookOrderId}
 <!-- 统计记录条数 -->
 <select id="countAll"  resultType="int">  
 	SELECT
-	 	count(book_order_id)
-	FROM book_order_tb
+	 	count(book_member_id)
+	FROM book_member_tb
 	<where>
 		<if test="acountId!=null">
 	AND acount_id=#{acountId}
+	</if>
+	<if test="expireDate!=null">
+	AND expire_date=#{expireDate}
 	</if>
 	<if test="createDate!=null">
 	AND DATE(create_date)=DATE(#{createDate})
 	</if>
 	<if test="updateDate!=null">
 	AND DATE(update_date)=DATE(#{updateDate})
+	</if>
+	<if test="status!=null">
+	AND status=#{status}
 	</if>
 	</where>
 </select>   

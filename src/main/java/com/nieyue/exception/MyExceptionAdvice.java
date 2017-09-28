@@ -57,5 +57,10 @@ public class MyExceptionAdvice {
 	public StateResult requestCertificateErrorHandler( Exception e) throws Exception {
 		return ResultUtil.getSlefSR(80000, "没有认证");
 	}
+	@ExceptionHandler(value={BookPayException.class})
+	@ResponseBody
+	public StateResult bookPayExceptionErrorHandler( Exception e) throws Exception {
+		return ResultUtil.getSlefSR(90001, "书城支付异常");
+	}
 	
 }

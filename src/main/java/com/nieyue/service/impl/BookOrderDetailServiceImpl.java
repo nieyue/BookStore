@@ -2,7 +2,6 @@ package com.nieyue.service.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -48,10 +47,7 @@ public class BookOrderDetailServiceImpl implements BookOrderDetailService{
 	@Override
 	public BookOrderDetail loadBookOrderDetail(Integer bookOrderDetailId) {
 		BookOrderDetail bookOrderDetail = bookOrderDetailDao.loadBookOrderDetail(bookOrderDetailId);
-			Map<String, Object> map = bookOrderBusiness.getBooOrderMoney(bookOrderDetail.getBillingMode(), bookOrderDetail.getPayType(), bookOrderDetail.getMoney(), bookOrderDetail.getRealMoney());
-			int day =  (int) map.get("day");
-			Date endDate = new Date(bookOrderDetail.getCreateDate().getTime()+day*24*3600*1000l);
-			if(endDate.before(new Date())){
+			if(bookOrderDetail.getEndDate().before(new Date())){
 				bookOrderDetail.setStatus(5);
 				bookOrderDetailDao.updateBookOrderDetail(bookOrderDetail);
 			}
@@ -61,23 +57,30 @@ public class BookOrderDetailServiceImpl implements BookOrderDetailService{
 	@Override
 	public int countAll(
 			Integer bookOrderId,
-			Integer status,
+			Date startDate,
+			Date endDate,
 			Date createDate,
-			Date updateDate) {
+			Date updateDate,
+			Integer status) {
 		int c = bookOrderDetailDao.countAll(
 				bookOrderId,
-				status,
+				startDate,
+				endDate,
 				createDate,
-				updateDate);
+				updateDate,
+				status
+				);
 		return c;
 	}
 
 	@Override
 	public List<BookOrderDetail> browsePagingBookOrderDetail(
 			Integer bookOrderId,
-			Integer status,
+			Date startDate,
+			Date endDate,
 			Date createDate,
 			Date updateDate,
+			Integer status,
 			int pageNum, int pageSize,
 			String orderName, String orderWay) {
 		if(pageNum<1){
@@ -88,16 +91,15 @@ public class BookOrderDetailServiceImpl implements BookOrderDetailService{
 		}
 		List<BookOrderDetail> l = bookOrderDetailDao.browsePagingBookOrderDetail(
 				bookOrderId,
-				status,
+				startDate,
+				endDate,
 				createDate,
 				updateDate,
+				status,
 				pageNum-1, pageSize, orderName, orderWay);
 		for (int i = 0; i < l.size(); i++) {
 			BookOrderDetail bod = l.get(i);
-			Map<String, Object> map = bookOrderBusiness.getBooOrderMoney(bod.getBillingMode(), bod.getPayType(), bod.getMoney(), bod.getRealMoney());
-			int day =  (int) map.get("day");
-			Date endDate = new Date(bod.getCreateDate().getTime()+day*24*3600*1000l);
-			if(endDate.before(new Date())){
+			if(bod.getEndDate().before(new Date())){
 				bod.setStatus(5);
 				bookOrderDetailDao.updateBookOrderDetail(bod);
 			}

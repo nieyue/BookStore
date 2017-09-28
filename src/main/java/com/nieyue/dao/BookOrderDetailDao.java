@@ -26,16 +26,20 @@ public interface BookOrderDetailDao {
 	/** 书订单详情总共数目 */	
 	public int countAll(
 			@Param("bookOrderId")Integer bookOrderId,
-			@Param("status")Integer status,
+			@Param("startDate")Date startDate,
+			@Param("endDate")Date endDate,
 			@Param("createDate")Date createDate,
-			@Param("updateDate")Date updateDate
+			@Param("updateDate")Date updateDate,
+			@Param("status")Integer status
 			);	
 	/** 分页书订单详情信息 */
 	public List<BookOrderDetail> browsePagingBookOrderDetail(
 			@Param("bookOrderId")Integer bookOrderId,
-			@Param("status")Integer status,
+			@Param("startDate")Date startDate,
+			@Param("endDate")Date endDate,
 			@Param("createDate")Date createDate,
 			@Param("updateDate")Date updateDate,
+			@Param("status")Integer status,
 			@Param("pageNum")int pageNum,
 			@Param("pageSize")int pageSize,
 			@Param("orderName")String orderName,

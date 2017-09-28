@@ -14,7 +14,6 @@ import java.util.List;
 import com.nieyue.bean.BookOrder;
 import com.nieyue.bean.BookOrderDetail;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -284,7 +283,19 @@ public class DateUtil {
 
         return isSameDate;
     }
-
+    /**
+     * 向前向后计算n个月
+     * @param date
+     * @param flag 月份减一为-1，加一为1
+     * @return
+     */
+    public static Date nextMonth(Date date,int flag) {
+    	 Calendar calendar = Calendar.getInstance();//日历对象
+    	 calendar.setTime(date);//设置当前日期
+    	 calendar.add(Calendar.MONTH, flag);//月份减一为-1，加一为1
+    	 Date nDate =calendar.getTime();
+    	 return nDate;
+    	}
     //  输出结果：  
     //  timeStamp=1417792627  
     //  date=2014-12-05 23:17:07  
@@ -343,5 +354,6 @@ public class DateUtil {
 		bookOrder2.getBookOrderDetailList().addAll(bodl);
 		System.err.println(bookOrder2.toString());
 		
+		System.err.println(nextMonth(new Date(),5).toLocaleString());
     }  
 }
