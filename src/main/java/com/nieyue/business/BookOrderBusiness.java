@@ -29,8 +29,8 @@ public class BookOrderBusiness {
    */
 	public Map<String ,Object> getBooOrderMoney(Date iStartDate,int billingMode ,int payType,Double iMoney,Double iRealMoney) throws BookPayException{
 		Double discount=1.0;//折扣默认为1
-		Double baseRealMoney=10.0;//一个月的基础价格
-		Double baseMoney=1000.0;//一个月的基础积分
+		Double baseRealMoney=12.0;//一个月的基础价格
+		Double baseMoney=1200.0;//一个月的基础积分
 		if(billingMode>=6){//
 			discount=0.95;
 		}
