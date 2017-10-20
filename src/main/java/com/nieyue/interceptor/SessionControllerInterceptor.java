@@ -64,7 +64,7 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         
         if(
         		request.getServletPath().equals("/")
-        		||((request.getRequestURI().indexOf("auth")>-1)&& MyDESutil.getMD5("auth1000").equals(request.getParameter("authid")))//临时授权
+        		//||((request.getRequestURI().indexOf("auth")>-1)&& MyDESutil.getMD5("auth1000").equals(request.getParameter("authid")))//临时授权
         		||request.getRequestURI().indexOf("tool")>-1
         		||request.getRequestURI().indexOf("swagger")>-1 
         		||request.getRequestURI().indexOf("api-docs")>-1
@@ -90,6 +90,8 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         		//bookOrder
         		||request.getRequestURI().indexOf("bookOrder/count")>-1
         		||request.getRequestURI().indexOf("bookOrder/list")>-1
+        		//||request.getRequestURI().indexOf("bookOrder/payment")>-1
+        		//||request.getRequestURI().indexOf("bookOrder/iospayNotifyUrl")>-1
         		||method.getName().equals("loadBookOrder")
         		//bookMember
         		||request.getRequestURI().indexOf("bookMember/count")>-1
@@ -166,13 +168,19 @@ public class SessionControllerInterceptor implements HandlerInterceptor {
         				|| request.getRequestURI().indexOf("/bookOrder/add")>-1
         				|| request.getRequestURI().indexOf("/bookOrder/payment")>-1
         				|| request.getRequestURI().indexOf("/bookOrder/update")>-1
+        				|| request.getRequestURI().indexOf("/bookOrder/iospayNotifyUrl")>-1
         				){
         			//增加自身
         			if( 
         					(request.getRequestURI().indexOf("/bookOrder/add")>-1
         					||request.getRequestURI().indexOf("/bookOrder/payment")>-1
+        					||request.getRequestURI().indexOf("/bookOrder/iospayNotifyUrl")>-1
         					)
         					&& request.getParameter("acountId").equals(sessionAcount.getAcountId().toString())){
+        				//自身不许回调
+        				if(request.getRequestURI().indexOf("/bookOrder/paymentNotifyUrl")>-1){
+        					throw new MySessionException();
+        				}
         				return true;
         			}
         			throw new MySessionException();

@@ -97,6 +97,12 @@ public class BookChapterServiceImpl implements BookChapterService{
 	@Override
 	public BookChapter loadBookChapter(Integer bookChapterId) {
 		BookChapter r = bookChapterDao.loadBookChapter(bookChapterId);
+		if(r.getContent().indexOf("<p>")>-1||r.getContent().indexOf("</p>")>-1){
+			r.setContent(r.getContent().replace("<p>", ""));
+		}
+		if(r.getContent().indexOf("</p>")>-1){
+			r.setContent(r.getContent().replace("</p>", ""));
+		}
 		return r;
 	}
 
@@ -164,6 +170,15 @@ public class BookChapterServiceImpl implements BookChapterService{
 				wordNumber,
 				bookId,createDate,updateDate,status,
 				pageNum-1, pageSize, orderName, orderWay);
+		for (int i = 0; i < l.size(); i++) {
+			BookChapter r = l.get(i);
+			if(r.getContent().indexOf("<p>")>-1||r.getContent().indexOf("</p>")>-1){
+				r.setContent(r.getContent().replace("<p>", ""));
+			}
+			if(r.getContent().indexOf("</p>")>-1){
+				r.setContent(r.getContent().replace("</p>", ""));
+			}
+		}
 		return l;
 	}
 	@Override
@@ -173,8 +188,14 @@ public class BookChapterServiceImpl implements BookChapterService{
 	}
 	@Override
 	public BookChapter readBookChapter(Integer bookId, Integer number) {
-		BookChapter bc = bookChapterDao.readBookChapter(bookId, number);
-		return bc;
+		BookChapter r = bookChapterDao.readBookChapter(bookId, number);
+		if(r.getContent().indexOf("<p>")>-1||r.getContent().indexOf("</p>")>-1){
+			r.setContent(r.getContent().replace("<p>", ""));
+		}
+		if(r.getContent().indexOf("</p>")>-1){
+			r.setContent(r.getContent().replace("</p>", ""));
+		}
+		return r;
 	}
 
 	

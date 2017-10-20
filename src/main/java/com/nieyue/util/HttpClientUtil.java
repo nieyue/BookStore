@@ -45,8 +45,11 @@ public class HttpClientUtil {
 	    
 	    //String ret = doPostXml(url, "<xml></xml>").toString();
 	    //String ret = doGet("http://3g.k.sohu.com/t/n152233000");
-	    Connection ret = Jsoup.connect("http://3g.k.sohu.com/t/n152233000");
-	    System.out.println(ret.get().select(".scroll-wrap"));
+	   //Connection ret = Jsoup.connect("http://3g.k.sohu.com/t/n152233000");
+	   // System.out.println(ret.get().select(".scroll-wrap"));
+	    url="http://www.newzhuan.cn/article/list";
+	    String ret = doPostString(url, "pageSize=2").toString();
+	    System.err.println(ret);
 	  }
 
 	  /**

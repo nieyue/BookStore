@@ -24,11 +24,13 @@ public interface BookOrderService {
 	/** 书订单总共数目 */	
 	public int countAll(
 			Integer acountId,
+			String orderNumber,
 			Date createDate,
 			Date updateDate);
 	/** 分页书订单信息 */
 	public List<BookOrder> browsePagingBookOrder(
 			Integer acountId,
+			String orderNumber,
 			Date createDate,
 			Date updateDate,
 			int pageNum,

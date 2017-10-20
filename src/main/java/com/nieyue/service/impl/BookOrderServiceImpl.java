@@ -59,7 +59,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 	@Value("${myPugin.paymentSystemDomainUrl}")
 	String paymentSystemDomainUrl;
 	
-	/**
+	/**回调
 	 * {acountId:1000,bookOrderDetailList:[{billingMode:1,payType:1,type:1}]}
 	 */
 	@Transactional(propagation=Propagation.REQUIRED)
@@ -154,7 +154,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 		return b;
 	}
 	/**
-	 * 同步
+	 * 业务订单同步
 	 * {acountId:1000,bookOrderDetailList:[{billingMode:1,payType:1,type:1}]}
 	 */
 	@Transactional(propagation=Propagation.REQUIRED)
@@ -257,7 +257,13 @@ public class BookOrderServiceImpl implements BookOrderService{
 		payment.setStatus(1);//已下单
 		payment.setType(bookOrderDetailList.get(0).getType());//支付
 		payment.setBusinessType(1);//书城支付
-		payment.setNotifyUrl(paymentSystemDomainUrl+"/payment/alipayNotifyUrl");
+		if(payment.getType()==1){//支付宝支付
+			payment.setNotifyUrl(paymentSystemDomainUrl+"/payment/alipayNotifyUrl");			
+		}else if(payment.getType()==2){//微信支付
+			payment.setNotifyUrl(paymentSystemDomainUrl+"/payment/wechatpayNotifyUrl");
+		}else if(payment.getType()==4){//IOS内购
+			payment.setNotifyUrl(paymentSystemDomainUrl+"/payment/iospayNotifyUrl");
+		}
 		//payment.setNotifyUrl(paymentSystemDomainUrl+"/payment/alipayNotifyUrl?auth="+MyDESutil.getMD5("1000"));
 		//{acountId:1000,bookOrderDetailList:[{billingMode:1,payType:1}]}
 		//{acountId:1000,orderNumber:12546546456,bookOrderDetailList:[{billingMode:1,payType:1,money:2,realMoney:0.01}]}
@@ -297,6 +303,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 			return result;
 		}
 	}
+	
 	@Transactional(propagation=Propagation.REQUIRED)
 	@Override
 	public boolean delBookOrder(Integer bookOrderId) {
@@ -327,10 +334,12 @@ public class BookOrderServiceImpl implements BookOrderService{
 	@Override
 	public int countAll(
 			Integer acountId,
+			String orderNumber,
 			Date createDate,
 			Date updateDate) {
 		int c = bookOrderDao.countAll(
 				acountId,
+				orderNumber,
 				createDate,
 				updateDate);
 		return c;
@@ -339,6 +348,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 	@Override
 	public List<BookOrder> browsePagingBookOrder(
 			Integer acountId,
+			String orderNumber,
 			Date createDate,
 			Date updateDate,
 			int pageNum, int pageSize,
@@ -351,6 +361,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 		}
 		List<BookOrder> l = bookOrderDao.browsePagingBookOrder(
 				acountId,
+				orderNumber,
 				createDate,
 				updateDate,
 				pageNum-1, pageSize, orderName, orderWay);

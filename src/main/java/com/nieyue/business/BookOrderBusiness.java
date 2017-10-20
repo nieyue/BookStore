@@ -35,7 +35,7 @@ public class BookOrderBusiness {
 			discount=0.95;
 		}
 		if(billingMode>=12){
-			discount=0.9;
+			discount=0.89;
 		}
 		Double money=0.0;//积分
 		Double realMoney=0.0;//真钱
@@ -57,12 +57,12 @@ public class BookOrderBusiness {
 		}else{
 			if(payType==1){//真钱支付
 				money=0.0;
-				realMoney=billingMode*baseRealMoney*discount;
+				realMoney=(double) Math.round((billingMode*baseRealMoney*discount));
 				//realMoney=0.01;
 			}else if(payType==2){//积分支付
-				money=billingMode*baseMoney*discount;
+				money=(double) Math.round((billingMode*baseMoney*discount));
 				realMoney=0.0;
-			}else if(payType==0 &&(iMoney+iRealMoney*100)==billingMode*baseMoney*discount){//全部支付
+			}else if(payType==0 &&(iMoney+iRealMoney*100)==(double)Math.round(billingMode*baseMoney*discount)){//全部支付
 				money=iMoney;
 				realMoney=iRealMoney;
 			}else{
@@ -84,6 +84,11 @@ public void setMap(Map<String ,Object> map) {
 }
 
 public static void main(String[] args) throws BookPayException {
+	for (int i = 0; i < 13; i++) {
+		//System.err.println(i*0.95*12);
+		System.err.println((double)Math.round(i*0.89*12));
+		System.out.println((double)Math.round(i*0.95*12));
+	}
 	 Map<String, Object> bm0pt0 = new BookOrderBusiness().getBooOrderMoney(null,0, 0, 500.0, 5.0);
 	 System.out.println(bm0pt0);
 	 Map<String, Object> bm0pt1 = new BookOrderBusiness().getBooOrderMoney(null,0, 1, 500.0, 5.0);
@@ -110,5 +115,6 @@ public static void main(String[] args) throws BookPayException {
 	 System.out.println(bm2pt3);
 	 Map<String, Object> bm2pt4 = new BookOrderBusiness().getBooOrderMoney(null,2, 0, null, null);
 	 System.out.println(bm2pt4);
+	 
 }
 }

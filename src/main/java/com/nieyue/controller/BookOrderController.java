@@ -1,5 +1,6 @@
 package com.nieyue.controller;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nieyue.bean.BookOrder;
 import com.nieyue.bean.BookOrderDetail;
+import com.nieyue.bean.Payment;
 import com.nieyue.rabbitmq.confirmcallback.Sender;
 import com.nieyue.service.BookOrderService;
+import com.nieyue.util.HttpClientUtil;
+import com.nieyue.util.MyDESutil;
 import com.nieyue.util.ResultUtil;
 import com.nieyue.util.StateResult;
 import com.nieyue.util.StateResultList;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 
@@ -38,6 +44,8 @@ public class BookOrderController {
 	private BookOrderService bookOrderService;
 	@Resource
 	private Sender sender;
+	@Value("${myPugin.paymentSystemDomainUrl}")
+	String paymentSystemDomainUrl;
 	
 	/**
 	 * 书订单分页浏览
@@ -49,6 +57,7 @@ public class BookOrderController {
 	@RequestMapping(value = "/list", method = {RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody StateResultList browsePagingBookOrder(
 			@RequestParam(value="acountId",required=false)Integer acountId,
+			@RequestParam(value="orderNumber",required=false)String orderNumber,
 			@RequestParam(value="createDate",required=false)Date createDate,
 			@RequestParam(value="updateDate",required=false)Date updateDate,
 			@RequestParam(value="pageNum",defaultValue="1",required=false)int pageNum,
@@ -56,7 +65,7 @@ public class BookOrderController {
 			@RequestParam(value="orderName",required=false,defaultValue="book_order_id") String orderName,
 			@RequestParam(value="orderWay",required=false,defaultValue="desc") String orderWay) throws Exception  {
 			List<BookOrder> list = new ArrayList<BookOrder>();
-			list= bookOrderService.browsePagingBookOrder(acountId,createDate,updateDate,pageNum, pageSize, orderName, orderWay);
+			list= bookOrderService.browsePagingBookOrder(acountId,orderNumber,createDate,updateDate,pageNum, pageSize, orderName, orderWay);
 			if(list.size()>0){
 				return ResultUtil.getSlefSRSuccessList(list);
 			}else{
@@ -81,6 +90,59 @@ public class BookOrderController {
 		//boolean am = bookOrderService.addBookOrderSynchronization(bookOrder);
 		sender.sendBookOrder(bookOrder);
 		return ResultUtil.getSR(true);
+	}
+	/**
+	 * ios支付回调
+	 * @return 
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/iospayNotifyUrl", method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody String appstorepayBookOrder(
+			@RequestBody String appstorepaybody,
+			HttpSession session) throws Exception {
+		String verifiedresult="{\"code\":\"40000\",\"msg\":\"异常\"}";
+		JSONObject jsonobject=JSONObject.fromObject(appstorepaybody);
+		String body = jsonobject.getString("body");
+		Object bookOrder = jsonobject.get("bookOrder");
+		verifiedresult = HttpClientUtil.doPostString(paymentSystemDomainUrl+"payment/iospayNotifyUrl","body="+body);
+		JSONObject jsonresult=JSONObject.fromObject(verifiedresult);
+		if(
+			jsonresult.get("status").equals("0")
+			||jsonresult.get("status").equals(0)
+				){//验证成功
+			JSONObject jsonbookorder=JSONObject.fromObject(bookOrder);
+			String orderNumber = jsonbookorder.getString("orderNumber");
+			String paymentjson = HttpClientUtil.doGet(paymentSystemDomainUrl+"/payment/list?auth="+MyDESutil.getMD5("1000")+"&orderNumber="+orderNumber);
+			JSONObject json=JSONObject.fromObject(paymentjson);
+			JSONArray jsa = JSONArray.fromObject(json.get("list"));
+			Payment payment = (Payment) JSONObject.toBean((JSONObject)jsa.get(0), Payment.class	);
+			 if(payment!=null){
+				// TODO 验签成功后
+				//按照支付结果异步通知中的描述，对支付结果中的业务内容进行1\2\3\4二次校验，校验成功后在response中返回success，校验失败返回failure
+				String businessNotifyUrl=payment.getBusinessNotifyUrl();
+				String fenge="&params=";//分割值
+				int fengelength=fenge.length();//分割长度
+				int num=businessNotifyUrl.indexOf(fenge);//分割位置
+				String prefix = businessNotifyUrl.substring(0,num);//分割之前
+				String pas = businessNotifyUrl.substring(num+fengelength);//分割之后
+				
+				String enpas = URLEncoder.encode(pas,"UTF-8");
+				String newBusinessNotifyUrl=prefix+fenge+enpas;
+				 String result = HttpClientUtil.doGet(newBusinessNotifyUrl);//异步回调
+				 if(JSONObject.fromObject(result).get("code").equals(200)
+						 ||JSONObject.fromObject(result).get("code").equals("200")){
+					 //支付成功
+					 payment.setStatus(2);//成功
+					 HttpClientUtil.doGet(paymentSystemDomainUrl+"/payment/update?auth="+MyDESutil.getMD5("1000")+"&paymentId="+payment.getPaymentId()+"&status="+payment.getStatus());
+					 return verifiedresult;
+				 }else{
+					 payment.setStatus(3);//失败
+					 HttpClientUtil.doGet(paymentSystemDomainUrl+"/payment/update?auth="+MyDESutil.getMD5("1000")+"&paymentId="+payment.getPaymentId()+"&status="+payment.getStatus());
+				 }
+				 }
+		
+		}
+		return verifiedresult;
 	}
 	/**
 	 * 书订单支付调用
@@ -148,10 +210,11 @@ public class BookOrderController {
 	@RequestMapping(value = "/count", method = {RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody int countAll(
 			@RequestParam(value="acountId",required=false)Integer acountId,
+			@RequestParam(value="orderNumber",required=false)String orderNumber,
 			@RequestParam(value="createDate",required=false)Date createDate,
 			@RequestParam(value="updateDate",required=false)Date updateDate,
 			HttpSession session)  {
-		int count = bookOrderService.countAll(acountId,createDate,updateDate);
+		int count = bookOrderService.countAll(acountId,orderNumber,createDate,updateDate);
 		return count;
 	}
 	/**

@@ -355,5 +355,8 @@ public class DateUtil {
 		System.err.println(bookOrder2.toString());
 		
 		System.err.println(nextMonth(new Date(),5).toLocaleString());
+		
+		String payjson="{\"package\":\"Sign=WXPay\",\"appid\":\"wx9916b928e1ae2ccb\",\"sign\":\"9B37B64AC655A30B9F4978062322986C\",\"partnerid\":\"1489128222\",\"prepayid\":\"wx20171017102519c838e5f5bb0128546383\",\"noncestr\":\"63c844009ee348aab0ebc8c1d5d59feb\",\"timestamp\":\"1508207117\"}";
+		System.out.println(JSONObject.fromObject(payjson).get("appid"));
     }  
 }

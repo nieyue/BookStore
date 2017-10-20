@@ -41,7 +41,8 @@ public class BookStoreJob {
 	//书单获取URL
 	public final static String YUE_CHENG_SHU_BA_BOOKORDER_URL ="http://116.62.189.118:7380/channelman/ws/rest/selectChannelBookList";
 	//单个书籍URL
-	public final static String YUE_CHENG_SHU_BA_BOOK_URL ="http://116.62.189.118:7680/bookyunying/ws/rest/yfb";
+	//public final static String YUE_CHENG_SHU_BA_BOOK_URL ="http://116.62.189.118:7680/bookyunying/ws/rest/yfb";
+	public final static String YUE_CHENG_SHU_BA_BOOK_URL ="http://116.62.189.118:7680/bookyunying/ws/rest/channelbook";
 	//渠道ID
 	public final static String YUE_CHENG_SHU_BA_channelidTwo ="118";
 	//渠道KEY
@@ -95,7 +96,8 @@ public class BookStoreJob {
 	  */
 	 public  String getYueChengShuBaBookDetails(Integer bookId) throws Exception{
 		 String sign=getYueChengShuBaBookSign( bookId);
-		 String s = HttpClientUtil.doGet(YUE_CHENG_SHU_BA_BOOK_URL+"/"+bookId+"/"+YUE_CHENG_SHU_BA_channelidTwo+"/"+sign);
+		// String s = HttpClientUtil.doGet(YUE_CHENG_SHU_BA_BOOK_URL+"/"+bookId+"/"+YUE_CHENG_SHU_BA_channelidTwo+"/"+sign);
+		 String s = HttpClientUtil.doGet(YUE_CHENG_SHU_BA_BOOK_URL+"/"+bookId+"/"+YUE_CHENG_SHU_BA_channelidTwo+"/"+sign+"/1");
 			return s;
 	 }
 	 /**
@@ -104,7 +106,7 @@ public class BookStoreJob {
 	 * @throws Exception 
 	  */
 	 public  List<Book> getYueChengShuBaBook(Integer bookId) throws Exception{
-		 BoundSetOperations<String, String> jsadbzso=stringRedisTemplate.boundSetOps(projectName+"BookStoreYueChengShuBaBook");
+		 BoundSetOperations<String, String> jsadbzso=stringRedisTemplate.boundSetOps(projectName+"YueChengShuBaBook2");
 		 int oldSize = jsadbzso.members().size();
   	   jsadbzso.add(bookId.toString());
   	   int nowSize = jsadbzso.members().size();
@@ -185,6 +187,20 @@ public class BookStoreJob {
 				getYueChengShuBaBook(booIdArray[i]);
 			}
 	        //System.out.println(new Date().toLocaleString()+" >>cron执行....");
+	    }
+	    /**
+	     * 悦诚书吧抓取
+	     * @throws Exception 
+	     */
+	    //@Scheduled(cron="0/5 * * * * ?")
+	    @Scheduled(cron="30 5 15 12 10 ?")
+	    public void onecronYueChengShuBaJob() throws Exception{
+	    	Integer[] booIdArray = getYueChengShuBaBookIdArray();
+	    	for (int i = 0; i < booIdArray.length; i++) {
+	    		//System.out.println(getYueChengShuBaBook(booIdArray[i]));
+	    		getYueChengShuBaBook(booIdArray[i]);
+	    	}
+	    	//System.out.println(new Date().toLocaleString()+" >>cron执行....");
 	    }
 	    /**
 	     * 任务完后执行
