@@ -3,7 +3,9 @@ package com.nieyue.controller;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -102,16 +104,25 @@ public class BookOrderController {
 			HttpSession session) throws Exception {
 		String verifiedresult="{\"code\":\"40000\",\"msg\":\"异常\"}";
 		JSONObject jsonobject=JSONObject.fromObject(appstorepaybody);
-		String body = jsonobject.getString("body");
 		Object bookOrder = jsonobject.get("bookOrder");
-		verifiedresult = HttpClientUtil.doPostString(paymentSystemDomainUrl+"payment/iospayNotifyUrl","body="+body);
+		JSONObject jsonbookorder=JSONObject.fromObject(bookOrder);
+		String orderNumber = jsonbookorder.getString("orderNumber");
+		
+		String body = jsonobject.getString("body");
+		 Map<String ,String > map=new HashMap<String,String>();
+		    map.put("orderNumber", orderNumber);
+		    map.put("body", body);
+		verifiedresult = HttpClientUtil.doPostForm(paymentSystemDomainUrl+"/payment/iospayNotifyUrl",map);
 		JSONObject jsonresult=JSONObject.fromObject(verifiedresult);
+		//重复验证
+		if(jsonresult.get("code")!=null&&jsonresult.get("code").equals("40000")){
+			return verifiedresult;
+		}
 		if(
+				//1==1
 			jsonresult.get("status").equals("0")
 			||jsonresult.get("status").equals(0)
 				){//验证成功
-			JSONObject jsonbookorder=JSONObject.fromObject(bookOrder);
-			String orderNumber = jsonbookorder.getString("orderNumber");
 			String paymentjson = HttpClientUtil.doGet(paymentSystemDomainUrl+"/payment/list?auth="+MyDESutil.getMD5("1000")+"&orderNumber="+orderNumber);
 			JSONObject json=JSONObject.fromObject(paymentjson);
 			JSONArray jsa = JSONArray.fromObject(json.get("list"));
@@ -181,19 +192,6 @@ public class BookOrderController {
 		//sender.sendBookOrder(bookOrder);
 		return ResultUtil.getSR(b);
 	}
-	/**
-	 * 书订单支付
-	 * @return 
-	 */
-	/*@RequestMapping(value = "/payment", method = {RequestMethod.GET,RequestMethod.POST})
-	public @ResponseBody StateResult addBookPayment(@RequestBody List<Integer> bookOrderDetailIdList, HttpSession session) {
-		if(bookOrderDetailIdList.size()<=0){
-			return ResultUtil.getSR(false);
-		}
-		//bookOrderService.addBookOrder(bookOrder)
-		sender.sendBookPayment(bookOrderDetailIdList);
-		return ResultUtil.getSR(true);
-	}*/
 	/**
 	 * 书订单删除
 	 * @return
