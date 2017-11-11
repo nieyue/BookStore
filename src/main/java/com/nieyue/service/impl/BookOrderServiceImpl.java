@@ -155,7 +155,7 @@ public class BookOrderServiceImpl implements BookOrderService{
 	}
 	/**
 	 * 业务订单同步
-	 * {acountId:1000,bookOrderDetailList:[{billingMode:1,payType:1,type:1}]}
+	 * {"acountId":1000,"bookOrderDetailList":[{"billingMode":1,"payType":1,"type":1}]}
 	 */
 	@Transactional(propagation=Propagation.REQUIRED)
 	public String addBookOrderSynchronization(BookOrder bookOrder)  {
